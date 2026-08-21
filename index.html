@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WellSync – Personalized Family Health & Wellness Platform</title>
+  <meta name="description" content="WellSync delivers personalized health and wellness recommendations for men, women, and children — diet, exercise, yoga, hydration, and sleep plans tailored to your unique profile." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <style>
+    .landing-logo { font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: var(--text-lg); color: var(--color-text); display: flex; align-items: center; gap: var(--space-2); }
+    .landing-logo-icon { width: 36px; height: 36px; background: var(--color-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .landing-nav-actions { display: flex; align-items: center; gap: var(--space-3); }
+    .how-section { padding: var(--space-20) 0; background: var(--color-surface); }
+    .step-card { display: flex; align-items: flex-start; gap: var(--space-4); padding: var(--space-5); }
+    .step-number { width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--color-primary); color: white; font-family: var(--font-mono); font-weight: var(--weight-bold); font-size: var(--text-base); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-content h4 { font-size: var(--text-base); font-weight: var(--weight-semibold); margin-bottom: var(--space-1); }
+    .step-content p { font-size: var(--text-sm); }
+    .cta-section { background: var(--color-primary); padding: var(--space-16) 0; text-align: center; }
+    .cta-section h2 { color: white; font-size: var(--text-2xl); margin-bottom: var(--space-4); }
+    .cta-section p { color: rgba(255,255,255,0.8); margin-bottom: var(--space-8); font-size: var(--text-base); }
+    .btn--white { background: white; color: var(--color-primary); border-color: white; }
+    .btn--white:hover { background: rgba(255,255,255,0.92); color: var(--color-primary-hover); }
+    .btn--outline-white { background: transparent; color: white; border-color: rgba(255,255,255,0.6); }
+    .btn--outline-white:hover { background: rgba(255,255,255,0.1); color: white; }
+    .disclaimer-banner { background: var(--color-surface-overlay); border-top: 1px solid var(--color-border); padding: var(--space-6) 0; }
+    .disclaimer-text { text-align: center; font-size: var(--text-xs); color: var(--color-text-muted); line-height: var(--leading-relaxed); max-width: 700px; margin: 0 auto; padding: 0 var(--space-6); }
+    .footer-bottom { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: var(--space-6) 0; }
+    .footer-bottom-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4); }
+    .footer-bottom-links { display: flex; gap: var(--space-6); }
+    .footer-bottom-links a { font-size: var(--text-sm); color: var(--color-text-muted); }
+    .testimonial-section { padding: var(--space-20) 0; }
+    .testimonial-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); }
+    .testimonial-card__stars { color: var(--color-warning); font-size: var(--text-sm); margin-bottom: var(--space-3); }
+    .testimonial-card__text { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--leading-relaxed); font-style: italic; margin-bottom: var(--space-4); }
+    .testimonial-card__author { display: flex; align-items: center; gap: var(--space-3); }
+    .testimonial-card__avatar { width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: var(--weight-bold); font-size: var(--text-sm); flex-shrink: 0; }
+    .testimonial-card__name { font-weight: var(--weight-semibold); font-size: var(--text-sm); }
+    .testimonial-card__role { font-size: var(--text-xs); color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  
+  <nav class="landing-nav" id="landing-nav">
+    <div class="landing-logo">
+      <div class="landing-logo-icon">🌿</div>
+      WellSync
+    </div>
+    <div class="landing-nav-actions">
+      <a href="login.html" class="btn btn--secondary btn--sm">Log In</a>
+      <a href="signup.html" class="btn btn--primary btn--sm">Get Started Free</a>
+    </div>
+  </nav>
+
+  
+  <section class="hero" id="hero">
+    <div class="hero__content">
+      <div class="hero__badge">
+        🌿 Personalized Health for Every Family Member
+      </div>
+      <h1 class="hero__title">
+        Your Wellness,
+        <span class="hero__title-accent">Personalized.</span>
+      </h1>
+      <p class="hero__subtitle">
+        WellSync creates intelligent, personalized health and wellness plans for men, women, and children — covering diet, exercise, yoga, hydration, and sleep, tailored to your unique profile.
+      </p>
+      <div class="hero__cta">
+        <a href="signup.html" class="btn btn--primary btn--xl" id="cta-signup">Start Your Wellness Journey →</a>
+        <a href="#how-it-works" class="btn btn--secondary btn--xl">See How It Works</a>
+      </div>
+      <div class="hero__stats">
+        <div>
+          <div class="hero__stat-value">3</div>
+          <div class="hero__stat-label">Profile Types</div>
+        </div>
+        <div>
+          <div class="hero__stat-value">7+</div>
+          <div class="hero__stat-label">Wellness Areas</div>
+        </div>
+        <div>
+          <div class="hero__stat-value">100%</div>
+          <div class="hero__stat-label">Personalized</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Everything Your Family Needs</h2>
+        <p>Comprehensive wellness coverage across all dimensions of health, personalized for each family member.</p>
+      </div>
+      <div class="grid grid-auto stagger">
+        <div class="feature-card animate-fadeIn">
+          <div class="feature-card__icon">🍎</div>
+          <div class="feature-card__title">Personalized Diet</div>
+          <p class="feature-card__desc">Meal plans tailored to your dietary preference, goals, and nutritional needs.</p>
+        </div>
+        <div class="feature-card animate-fadeIn">
+          <div class="feature-card__icon">🏋️</div>
+          <div class="feature-card__title">Smart Exercise Plans</div>
+          <p class="feature-card__desc">Workout recommendations matched to your fitness level, goals, and age.</p>
+        </div>
+        <div class="feature-card animate-fadeIn">
+          <div class="feature-card__icon">🧘</div>
+          <div class="feature-card__title">Yoga & Flexibility</div>
+          <p class="feature-card__desc">Guided yoga sequences for relaxation, strength, and flexibility goals.</p>
+        </div>
+        <div class="feature-card animate-fadeIn">
+          <div class="feature-card__icon">💧</div>
+          <div class="feature-card__title">Hydration Tracking</div>
+          <p class="feature-card__desc">Daily water intake targets calculated for your body weight and activity level.</p>
+        </div>
+        <div class="feature-card animate-fadeIn">
+          <div class="feature-card__icon">😴</div>
+          <div class="feature-card__title">Sleep Optimization</div>
+          <p class="feature-card__desc">Age-appropriate sleep recommendations backed by wellness guidelines.</p>
+        </div>
+        <div class="feature-card animate-fadeIn">
+          <div class="feature-card__icon">🌸</div>
+          <div class="feature-card__title">Women's Wellness</div>
+          <p class="feature-card__desc">Dedicated menstrual cycle tracking with phase-based wellness suggestions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="for-whom" id="for-whom">
+    <div class="container">
+      <div class="section-header">
+        <h2>Built for Every Family Member</h2>
+        <p>Separate, thoughtfully designed wellness experiences for men, women, and children.</p>
+      </div>
+      <div class="grid grid-3 stagger">
+        <div class="profile-card profile-card--men animate-fadeIn">
+          <span class="profile-card__emoji">👨</span>
+          <h3 class="profile-card__title">Men</h3>
+          <div class="profile-card__items">
+            <span class="profile-card__item">✓ Strength & muscle development plans</span>
+            <span class="profile-card__item">✓ Fitness & cardio programs</span>
+            <span class="profile-card__item">✓ Weight management strategies</span>
+            <span class="profile-card__item">✓ High-protein meal recommendations</span>
+          </div>
+        </div>
+        <div class="profile-card profile-card--women animate-fadeIn">
+          <span class="profile-card__emoji">👩</span>
+          <h3 class="profile-card__title">Women</h3>
+          <div class="profile-card__items">
+            <span class="profile-card__item">✓ Flexible & balanced fitness plans</span>
+            <span class="profile-card__item">✓ Menstrual cycle wellness tracking</span>
+            <span class="profile-card__item">✓ Mood & energy-aware suggestions</span>
+            <span class="profile-card__item">✓ Iron & calcium-rich nutrition focus</span>
+          </div>
+        </div>
+        <div class="profile-card profile-card--child animate-fadeIn">
+          <span class="profile-card__emoji">👶</span>
+          <h3 class="profile-card__title">Children</h3>
+          <div class="profile-card__items">
+            <span class="profile-card__item">✓ Healthy growth-focused nutrition</span>
+            <span class="profile-card__item">✓ Age-appropriate activity plans</span>
+            <span class="profile-card__item">✓ Sleep & routine guidance</span>
+            <span class="profile-card__item">✓ Screen-time & outdoor play balance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="how-section" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2>How WellSync Works</h2>
+        <p>Get your personalized wellness plan in minutes.</p>
+      </div>
+      <div class="grid grid-2 gap-6">
+        <div class="card">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Create Your Account</h4>
+              <p>Sign up with your name and email — free and takes under a minute.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Build Your Profile</h4>
+              <p>Select Men, Women, or Children. Enter your age, weight, height, activity level, and goals.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Get Personalized Recommendations</h4>
+              <p>Our recommendation engine generates a plan unique to your profile — diet, exercise, yoga, and more.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Track Your Progress</h4>
+              <p>Log your daily activities, meals, water, and sleep. Watch your Wellness Score grow.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="testimonial-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Trusted by Wellness Seekers</h2>
+        <p>See how WellSync helps real people reach their wellness goals.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="testimonial-card">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__text">"The personalized meal plan actually takes into account that I'm vegetarian AND trying to build strength. Previous apps just gave everyone the same plan."</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar">R</div>
+            <div>
+              <div class="testimonial-card__name">Rahul M.</div>
+              <div class="testimonial-card__role">Fitness Enthusiast</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__text">"The menstrual wellness module is thoughtful and doesn't make any scary medical claims. It just gives helpful, kind suggestions for each phase."</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar">P</div>
+            <div>
+              <div class="testimonial-card__name">Priya S.</div>
+              <div class="testimonial-card__role">Yoga Practitioner</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__text">"Finally a family wellness app that treats children differently from adults. The child recommendations focus on healthy routines, not weight loss."</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar">A</div>
+            <div>
+              <div class="testimonial-card__name">Anita K.</div>
+              <div class="testimonial-card__role">Parent of Two</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to Start Your Wellness Journey?</h2>
+      <p>Join WellSync today. It's free, personalized, and takes just 3 minutes to set up.</p>
+      <div class="flex justify-center gap-4 flex-wrap">
+        <a href="signup.html" class="btn btn--white btn--lg" id="cta-bottom">Create Free Account →</a>
+        <a href="login.html" class="btn btn--outline-white btn--lg">Already a Member? Log In</a>
+      </div>
+    </div>
+  </section>
+
+  
+  <div class="disclaimer-banner">
+    <p class="disclaimer-text">
+      ⚕️ <strong>Medical Disclaimer:</strong> WellSync provides general wellness information and personalized educational recommendations. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional for health decisions. For children's health and women's reproductive health, please consult appropriate specialists.
+    </p>
+  </div>
+
+  
+  <footer class="footer-bottom">
+    <div class="container">
+      <div class="footer-bottom-inner">
+        <div class="flex items-center gap-2">
+          <div class="landing-logo-icon" style="width:28px;height:28px;font-size:0.9rem;background:var(--color-primary);border-radius:6px;display:flex;align-items:center;justify-content:center;">🌿</div>
+          <span style="font-family:var(--font-heading);font-weight:600;font-size:var(--text-sm);">WellSync</span>
+          <span style="font-size:var(--text-xs);color:var(--color-text-muted);">Phase 1 | Educational Project</span>
+        </div>
+        <div class="footer-bottom-links">
+          <a href="login.html">Login</a>
+          <a href="signup.html">Sign Up</a>
+          <a href="dashboard.html">Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    'use strict';
+    // Redirect to dashboard if already logged in
+    if (Auth.isLoggedIn()) {
+      window.location.href = 'dashboard.html';
+    }
+
+    // Navbar scroll effect
+    const nav = document.getElementById('landing-nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+  </script>
+</body>
+</html>
