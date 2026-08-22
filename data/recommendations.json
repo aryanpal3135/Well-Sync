@@ -1,0 +1,214 @@
+{
+  "scoringWeights": {
+    "goalMatch":      40,
+    "ageGroupMatch":  20,
+    "dietTypeMatch":  30,
+    "intensityMatch": 10
+  },
+
+  "bmiClassification": {
+    "underweight": { "max": 18.5, "label": "Underweight" },
+    "normal":      { "min": 18.5, "max": 25,   "label": "Normal Weight" },
+    "overweight":  { "min": 25,   "max": 30,   "label": "Overweight" },
+    "obese":       { "min": 30,   "label": "Obese" }
+  },
+
+  "activityLevelScore": {
+    "sedentary":        1,
+    "lightly_active":   2,
+    "moderately_active":3,
+    "very_active":      4
+  },
+
+  "activityMultiplier": {
+    "sedentary":        1.2,
+    "lightly_active":   1.375,
+    "moderately_active":1.55,
+    "very_active":      1.725
+  },
+
+  "hydrationBase": {
+    "male":   35,
+    "female": 31,
+    "child":  40
+  },
+  "hydrationNote": "ml per kg of body weight per day (base, adjusted by activity)",
+
+  "hydrationActivityBonus": {
+    "sedentary":        0,
+    "lightly_active":   200,
+    "moderately_active":400,
+    "very_active":      600
+  },
+
+  "sleepRecommendations": {
+    "child_0_5":   { "min": 10, "max": 14, "label": "10–14 hours" },
+    "child_6_12":  { "min": 9,  "max": 12, "label": "9–12 hours" },
+    "teen_13_18":  { "min": 8,  "max": 10, "label": "8–10 hours" },
+    "adult_19_64": { "min": 7,  "max": 9,  "label": "7–9 hours" },
+    "senior_65":   { "min": 7,  "max": 8,  "label": "7–8 hours" }
+  },
+
+  "wellnessScoreWeights": {
+    "nutrition":  25,
+    "exercise":   25,
+    "hydration":  20,
+    "sleep":      20,
+    "mindfulness":10
+  },
+
+  "goalCalorieAdjustment": {
+    "weight_management": -300,
+    "general_wellness":    0,
+    "fitness":           100,
+    "strength":          200,
+    "flexibility":         0
+  },
+
+  "intensityForGoal": {
+    "weight_management": ["low", "moderate"],
+    "general_wellness":  ["low", "moderate"],
+    "fitness":           ["moderate", "high"],
+    "strength":          ["moderate", "high"],
+    "flexibility":       ["low", "moderate"]
+  },
+
+  "exerciseCountByGoal": {
+    "weight_management": 4,
+    "general_wellness":  3,
+    "fitness":           4,
+    "strength":          4,
+    "flexibility":       3
+  },
+
+  "yogaCountByGoal": {
+    "weight_management": 3,
+    "general_wellness":  4,
+    "fitness":           3,
+    "strength":          2,
+    "flexibility":       5
+  },
+
+  "mealSlotsPerDay": ["breakfast", "lunch", "snack", "dinner"],
+
+  "foodsPerMeal": {
+    "breakfast": 2,
+    "lunch":     2,
+    "snack":     1,
+    "dinner":    2
+  },
+
+  "lifestyleTips": {
+    "weight_management": [
+      "Eat slowly and mindfully to help recognize satiety cues.",
+      "Avoid sugary beverages — choose water, herbal tea, or coconut water.",
+      "Don't skip meals; focus on portion control instead.",
+      "Include a 10-minute walk after meals to aid digestion.",
+      "Prioritize 7–9 hours of quality sleep — poor sleep can increase hunger hormones."
+    ],
+    "general_wellness": [
+      "Practice gratitude journaling for 5 minutes each morning.",
+      "Spend at least 20 minutes outdoors daily for Vitamin D.",
+      "Limit screen time before bed by at least 60 minutes.",
+      "Stay socially connected — meaningful relationships support mental health.",
+      "Practice deep breathing or meditation for 10 minutes daily."
+    ],
+    "fitness": [
+      "Progressive overload: gradually increase workout intensity each week.",
+      "Fuel your workout with a light snack 30–60 minutes before.",
+      "Rest is part of training — schedule 1–2 recovery days per week.",
+      "Track your workouts to see progress and stay motivated.",
+      "Warm up for 5 minutes before every workout."
+    ],
+    "strength": [
+      "Consume protein within 30–45 minutes post-workout for optimal muscle recovery.",
+      "Progressive overload is key — add weight or reps each week.",
+      "Compound movements (squats, deadlifts, bench press) give the most benefit.",
+      "Get 8+ hours of sleep — growth hormone is released during sleep.",
+      "Creatine monohydrate is one of the most researched safe supplements."
+    ],
+    "flexibility": [
+      "Stretch when muscles are warm, not cold.",
+      "Consistency beats intensity — daily gentle stretching is better than occasional intense sessions.",
+      "Breathe into each stretch; never force a stretch through pain.",
+      "Yoga and foam rolling complement each other well.",
+      "Include both static and dynamic stretching in your routine."
+    ]
+  },
+
+  "menstrualPhaseWellness": {
+    "menstruation": {
+      "label": "Menstruation Phase",
+      "duration": "Days 1–5",
+      "generalSuggestions": [
+        "Stay well-hydrated — aim for at least 2.5 liters of water.",
+        "Warm herbal teas (ginger, chamomile) may help with comfort.",
+        "Gentle movement like walking or yoga is generally well-tolerated.",
+        "Iron-rich foods (spinach, dal, legumes) support healthy iron levels.",
+        "Heating pads may provide soothing comfort for cramping.",
+        "Rest is important — listen to your body's energy signals."
+      ],
+      "recommendedActivity": ["gentle_walking", "yoga", "stretching"],
+      "note": "These are general wellness suggestions, not medical advice."
+    },
+    "follicular": {
+      "label": "Follicular Phase",
+      "duration": "Days 6–13",
+      "generalSuggestions": [
+        "Energy typically increases during this phase.",
+        "A good time to try more challenging workouts.",
+        "Focus on nutrient-dense foods rich in antioxidants.",
+        "Stay hydrated to support natural energy levels."
+      ],
+      "recommendedActivity": ["cardio", "strength", "hiit"],
+      "note": "These are general wellness suggestions, not medical advice."
+    },
+    "ovulation": {
+      "label": "Ovulation Phase",
+      "duration": "Days 14–17",
+      "generalSuggestions": [
+        "Peak energy phase — you may feel most energetic now.",
+        "Good time for social activities and high-intensity workouts.",
+        "Focus on whole foods and complex carbohydrates for sustained energy.",
+        "Stay well-hydrated."
+      ],
+      "recommendedActivity": ["hiit", "strength", "cardio"],
+      "note": "These are general wellness suggestions, not medical advice."
+    },
+    "luteal": {
+      "label": "Luteal Phase",
+      "duration": "Days 18–28",
+      "generalSuggestions": [
+        "Energy may start to decrease toward end of this phase.",
+        "Include magnesium-rich foods (nuts, seeds, dark chocolate) for mood support.",
+        "Reduce caffeine and salt to minimize bloating.",
+        "Prioritize sleep and rest.",
+        "Gentle yoga and walking are helpful for mood regulation.",
+        "If experiencing unusual symptoms, consult a qualified healthcare professional."
+      ],
+      "recommendedActivity": ["yoga", "walking", "stretching"],
+      "note": "These are general wellness suggestions, not medical advice."
+    }
+  },
+
+  "childWellnessFocus": [
+    "Balanced nutrition with all food groups — grains, protein, dairy, fruits, vegetables.",
+    "60+ minutes of moderate-to-vigorous physical activity per day (WHO recommendation).",
+    "Limit screen time to 2 hours/day for ages 6–12.",
+    "8–12 hours of sleep depending on age.",
+    "Outdoor play supports physical, mental, and social development.",
+    "Encourage variety in food rather than restricting specific foods.",
+    "Hydration: about 1.5–2 liters of water per day (age-dependent).",
+    "Never use food as a reward or punishment.",
+    "Family meals support healthy eating habits.",
+    "Regular health check-ups with a qualified pediatrician."
+  ],
+
+  "disclaimers": {
+    "general": "WellSync provides general wellness information and personalized educational recommendations. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional for health decisions.",
+    "children": "Recommendations for children focus on general healthy development. For growth, nutrition, or health concerns, always consult a qualified pediatrician.",
+    "women": "Women's wellness suggestions are general in nature. For menstrual health, hormonal concerns, or reproductive health, please consult a qualified gynecologist.",
+    "menstrual": "Menstrual cycle predictions are estimates based on average cycle length. Variations are normal. If you experience severe or unusual symptoms, consult a qualified healthcare professional.",
+    "score": "The WellSync Wellness Score is a motivational tracking tool, not a medical measurement."
+  }
+}

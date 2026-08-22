@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up – WellSync</title>
+  <meta name="description" content="Create your free WellSync account and start your personalized wellness journey today." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+  <div class="auth-page">
+
+    
+    <div class="auth-panel--brand">
+      <div class="deco-shape deco-shape-1"></div>
+      <div class="deco-shape deco-shape-2"></div>
+      <div class="auth-brand">
+        <div class="auth-brand__logo">
+          <div class="auth-brand__logo-icon">🌿</div>
+          <span class="auth-brand__logo-text">WellSync</span>
+        </div>
+        <h2 class="auth-brand__headline">Start Your<br/>Wellness Journey</h2>
+        <p class="auth-brand__tagline">Create your free account in under 2 minutes and get a personalized health plan built just for you.</p>
+        <div class="auth-brand__features">
+          <div class="auth-brand__feature">
+            <div class="auth-brand__feature-icon">🍎</div>
+            <span>Personalized diet & meal plans</span>
+          </div>
+          <div class="auth-brand__feature">
+            <div class="auth-brand__feature-icon">🏋️</div>
+            <span>Goal-based exercise recommendations</span>
+          </div>
+          <div class="auth-brand__feature">
+            <div class="auth-brand__feature-icon">🧘</div>
+            <span>Yoga & wellness for every profile</span>
+          </div>
+          <div class="auth-brand__feature">
+            <div class="auth-brand__feature-icon">📊</div>
+            <span>Progress tracking & wellness score</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="auth-panel--form">
+      <div class="auth-form-wrapper animate-fadeIn">
+
+        
+        <div class="flex items-center gap-2 mb-8" style="display:none" id="mobile-logo">
+          <div style="width:36px;height:36px;background:var(--color-primary);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🌿</div>
+          <span style="font-family:var(--font-heading);font-weight:700;font-size:var(--text-lg);">WellSync</span>
+        </div>
+
+        <div class="auth-form-header">
+          <h1>Create your account</h1>
+          <p>Join WellSync — your personalized health companion.</p>
+        </div>
+
+        <form class="auth-form" id="signup-form" novalidate>
+
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name <span class="required">*</span></label>
+            <input
+              class="form-input"
+              type="text"
+              id="name"
+              name="name"
+              placeholder="e.g., Rahul Sharma"
+              autocomplete="name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+            <input
+              class="form-input"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password <span class="required">*</span></label>
+            <input
+              class="form-input"
+              type="password"
+              id="password"
+              name="password"
+              placeholder="At least 6 characters"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm-password">Confirm Password <span class="required">*</span></label>
+            <input
+              class="form-input"
+              type="password"
+              id="confirm-password"
+              name="confirmPassword"
+              placeholder="Repeat your password"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" class="form-check__input" id="terms" name="terms" required />
+              <span class="form-check__label">
+                I understand that WellSync provides general wellness information only and is not a substitute for professional medical advice.
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full btn--lg" id="signup-btn">
+            Create Account
+          </button>
+        </form>
+
+        <div class="divider--text" style="margin-top:var(--space-6)">
+          <span></span>
+        </div>
+
+        <p class="auth-footer-link">
+          Already have an account? <a href="login.html">Log In →</a>
+        </p>
+
+        <p style="text-align:center;font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-4);line-height:var(--leading-relaxed);">
+          ⚕️ WellSync provides educational wellness information only. Not a substitute for medical advice.
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    'use strict';
+
+    Auth.redirectIfLoggedIn();
+    ThemeManager.init();
+
+    // Mobile logo visibility
+    const mobileLogoEl = document.getElementById('mobile-logo');
+    if (window.innerWidth <= 768) mobileLogoEl.style.display = 'flex';
+
+    // Theme toggle (mobile)
+    const mobileThemeBtn = document.getElementById('theme-toggle-mobile');
+    if (mobileThemeBtn) mobileThemeBtn.addEventListener('click', () => ThemeManager.toggle());
+
+    // Form submission
+    const form = document.getElementById('signup-form');
+    const btn  = document.getElementById('signup-btn');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      FormHelpers.clearAllErrors(form);
+
+      const data = FormHelpers.serialize(form);
+
+      // Validate terms
+      if (!document.getElementById('terms').checked) {
+        Toast.show('Please accept the wellness disclaimer to continue.', 'warning');
+        return;
+      }
+
+      btn.classList.add('btn--loading');
+      btn.disabled = true;
+
+      // Small delay to simulate processing (Phase 2: real API call)
+      setTimeout(() => {
+        const result = Auth.register(data);
+        btn.classList.remove('btn--loading');
+        btn.disabled = false;
+
+        if (result.success) {
+          Toast.show('Account created successfully! Redirecting to login...', 'success');
+          setTimeout(() => {
+            const emailParam = encodeURIComponent(data.email || '');
+            window.location.href = `login.html?registered=true&email=${emailParam}`;
+          }, 1000);
+        } else {
+          Toast.show(result.message, 'error');
+
+          // Highlight specific fields
+          if (result.message.includes('email')) {
+            FormHelpers.setError(document.getElementById('email'), result.message);
+          } else if (result.message.includes('Password') || result.message.includes('password')) {
+            FormHelpers.setError(document.getElementById('password'), result.message);
+          } else if (result.message.includes('match')) {
+            FormHelpers.setError(document.getElementById('confirm-password'), result.message);
+          }
+        }
+      }, 600);
+    });
+
+    // Real-time email validation
+    document.getElementById('email').addEventListener('blur', function() {
+      if (this.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value)) {
+        FormHelpers.setError(this, 'Please enter a valid email address.');
+      } else {
+        FormHelpers.clearError(this);
+      }
+    });
+  </script>
+</body>
+</html>

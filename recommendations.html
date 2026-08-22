@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recommendations – WellSync</title>
+  <meta name="description" content="Your personalized health and wellness recommendations from WellSync." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <style>
+    .metrics-strip {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-6);
+    }
+    .metric-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 100px;
+    }
+    .metric-pill__value { font-family: var(--font-mono); font-size: var(--text-lg); font-weight: var(--weight-bold); line-height: 1; }
+    .metric-pill__label { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 2px; text-align: center; }
+    .metric-divider { width: 1px; background: var(--color-border); align-self: stretch; margin: 0 var(--space-2); }
+    .rec-section { margin-bottom: var(--space-8); }
+    .rec-section-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--weight-bold);
+      margin-bottom: var(--space-4);
+      display: flex; align-items: center; gap: var(--space-3);
+      padding-bottom: var(--space-3);
+      border-bottom: 2px solid var(--color-border);
+    }
+    .food-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      transition: all var(--duration-fast);
+    }
+    .food-card:hover { border-color: var(--color-primary); box-shadow: var(--shadow-sm); }
+    .food-card__header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-2); }
+    .food-card__name { font-weight: var(--weight-semibold); font-size: var(--text-base); }
+    .food-card__macros { display: flex; gap: var(--space-3); margin-top: var(--space-2); flex-wrap: wrap; }
+    .food-macro { font-size: var(--text-xs); color: var(--color-text-muted); display: flex; align-items: center; gap: 4px; }
+    .food-macro strong { font-family: var(--font-mono); color: var(--color-text); font-size: var(--text-sm); }
+    .meal-group { margin-bottom: var(--space-6); }
+    .meal-group__title {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--text-sm); font-weight: var(--weight-semibold);
+      text-transform: uppercase; letter-spacing: var(--tracking-wider);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-3);
+    }
+    .foods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-3); }
+    .hydration-card {
+      background: linear-gradient(135deg, var(--color-secondary-light) 0%, var(--color-primary-light) 100%);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      text-align: center;
+    }
+    .hydration-number {
+      font-family: var(--font-mono);
+      font-size: var(--text-4xl);
+      font-weight: var(--weight-extrabold);
+      color: var(--color-secondary);
+      line-height: 1;
+    }
+    .lifestyle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-3); }
+    .tip-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-primary);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+
+    /* ── No-Profile Modal ──────────────────────────────── */
+    #no-profile-modal {
+      display: none;
+      position: fixed; inset: 0; z-index: 9999;
+      align-items: center; justify-content: center;
+    }
+    #no-profile-modal.show { display: flex; }
+    .no-profile-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(10,15,30,0.6);
+      backdrop-filter: blur(6px);
+      animation: npFadeIn 0.25s ease;
+    }
+    .no-profile-dialog {
+      position: relative; z-index: 1;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      padding: var(--space-10) var(--space-8);
+      width: 100%; max-width: 440px;
+      margin: var(--space-4);
+      text-align: center;
+      animation: npSlideUp 0.28s cubic-bezier(.34,1.4,.64,1);
+    }
+    .no-profile-icon { font-size: 3.5rem; margin-bottom: var(--space-4); }
+    .no-profile-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--weight-bold);
+      margin-bottom: var(--space-3);
+    }
+    .no-profile-msg {
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin-bottom: var(--space-6);
+    }
+    @keyframes npFadeIn  { from { opacity:0 } to { opacity:1 } }
+    @keyframes npSlideUp { from { opacity:0; transform:translateY(28px) scale(.96) } to { opacity:1; transform:none } }
+  </style>
+</head>
+<body>
+
+  
+  <nav class="navbar">
+    <div class="container navbar__inner">
+      <a href="dashboard.html" class="navbar__logo">
+        <div class="navbar__logo-icon">🌿</div>
+        WellSync
+      </a>
+      <div class="navbar__nav">
+        <a href="dashboard.html" class="navbar__link">📊 Dashboard</a>
+        <a href="profile.html" class="navbar__link">👤 Profile</a>
+        <a href="recommendations.html" class="navbar__link active">💡 Recommendations</a>
+        <a href="progress.html" class="navbar__link">📈 Progress</a>
+        <a href="menstrual.html" class="navbar__link" id="cycle-nav-link" style="display:none">🌸 Cycle</a>
+      </div>
+      <div class="navbar__actions">
+        <button class="btn btn--ghost btn--sm" data-action="logout">↩ Logout</button>
+        <button class="navbar__burger" id="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="navbar__mobile-drawer" id="mobile-drawer">
+    <a href="dashboard.html" class="navbar__link">📊 Dashboard</a>
+    <a href="profile.html" class="navbar__link">👤 Profile</a>
+    <a href="recommendations.html" class="navbar__link active">💡 Recommendations</a>
+    <a href="progress.html" class="navbar__link">📈 Progress</a>
+    <a href="menstrual.html" class="navbar__link" id="cycle-nav-link-mobile" style="display:none">🌸 Cycle</a>
+    <button class="btn btn--ghost btn--sm" data-action="logout">↩ Logout</button>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+
+      
+      <div class="mb-6 flex justify-between items-center flex-wrap gap-4">
+        <div>
+          <h1 style="font-family:var(--font-heading);font-size:var(--text-2xl);font-weight:var(--weight-bold);">
+            💡 Personalized Recommendations
+          </h1>
+          <p class="text-muted text-sm mt-1" id="profile-subtitle">Loading your personalized plan…</p>
+        </div>
+        <div class="flex gap-3">
+          <a href="profile.html" class="btn btn--secondary btn--sm">✏️ Edit Profile</a>
+        </div>
+      </div>
+
+      
+      <div class="metrics-strip stagger" id="metrics-strip">
+        <div class="spinner"></div>
+      </div>
+
+      
+      <div class="tabs mb-6" id="rec-tabs">
+        <button class="tab-btn active" data-tab="diet">🍎 Diet</button>
+        <button class="tab-btn" data-tab="exercise">🏋️ Exercise</button>
+        <button class="tab-btn" data-tab="yoga">🧘 Yoga</button>
+        <button class="tab-btn" data-tab="hydration">💧 Hydration</button>
+        <button class="tab-btn" data-tab="sleep">😴 Sleep</button>
+        <button class="tab-btn" data-tab="lifestyle">🌿 Lifestyle</button>
+        <button class="tab-btn" data-tab="cycle" id="cycle-tab-btn" style="display:none">🌸 Cycle</button>
+      </div>
+
+      
+      <div id="rec-loading" style="text-align:center;padding:var(--space-16)">
+        <div class="spinner"></div>
+        <p class="text-muted mt-4">Generating your personalized plan…</p>
+      </div>
+
+      
+      <div id="rec-content" style="display:none">
+
+        
+        <div class="tab-content active" id="tab-diet" data-section="diet">
+          <div id="diet-content"></div>
+        </div>
+
+        
+        <div class="tab-content" id="tab-exercise" data-section="exercise">
+          <div id="exercise-content"></div>
+        </div>
+
+        
+        <div class="tab-content" id="tab-yoga" data-section="yoga">
+          <div id="yoga-content"></div>
+        </div>
+
+        
+        <div class="tab-content" id="tab-hydration" data-section="hydration">
+          <div id="hydration-content"></div>
+        </div>
+
+        
+        <div class="tab-content" id="tab-sleep" data-section="sleep">
+          <div id="sleep-content"></div>
+        </div>
+
+        
+        <div class="tab-content" id="tab-lifestyle" data-section="lifestyle">
+          <div id="lifestyle-content"></div>
+        </div>
+
+        
+        <div class="tab-content" id="tab-cycle" data-section="cycle">
+          <div id="cycle-content"></div>
+        </div>
+
+      </div>
+
+      
+      <div class="alert alert--info mt-8">
+        <span class="alert__icon">⚕️</span>
+        <div class="alert__body">
+          <div class="alert__title">Educational Recommendations Disclaimer</div>
+          These recommendations are generated by a rule-based algorithm for educational purposes. They are not medical advice. Consult qualified healthcare professionals before making significant changes to your diet or exercise routine.
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/recommendationEngine.js"></script>
+  <script>
+  'use strict';
+
+  let currentUser   = null;
+  let activeProfile = null;
+  let plan          = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    Auth.requireAuth();
+    currentUser   = Auth.getCurrentUser();
+    activeProfile = Storage.getActiveProfile(currentUser.id);
+
+    if (!activeProfile) {
+      const modal = document.getElementById('no-profile-modal');
+      if (modal) modal.classList.add('show');
+      return;
+    }
+
+    await generateAndRender();
+    initTabs();
+
+    // Handle hash navigation from other pages
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      const btn = document.querySelector(`[data-tab="${hash}"]`);
+      if (btn) btn.click();
+    }
+  });
+
+  async function generateAndRender() {
+    try {
+      const cached = localStorage.getItem(`wellsync_plan_${currentUser.id}_${activeProfile.id}`);
+      plan = cached ? JSON.parse(cached) : await RecommendationEngine.generatePersonalizedPlan(activeProfile);
+      localStorage.setItem(`wellsync_plan_${currentUser.id}_${activeProfile.id}`, JSON.stringify(plan));
+
+      renderMetrics();
+      renderDiet();
+      renderExercise();
+      renderYoga();
+      renderHydration();
+      renderSleep();
+      renderLifestyle();
+      renderCycle();
+
+      document.getElementById('rec-loading').style.display = 'none';
+      document.getElementById('rec-content').style.display = 'block';
+
+      const gender = { men: '👨 Men', women: '👩 Women', child: '👶 Child' };
+      document.getElementById('profile-subtitle').textContent =
+        `Profile: ${activeProfile.name} · ${gender[activeProfile.gender]} · ${RecommendationEngine.formatGoal(activeProfile.goal)}`;
+
+    } catch (err) {
+      console.error('Render error:', err);
+      Toast.show('Error generating plan. Please refresh.', 'error');
+    }
+  }
+
+  function renderMetrics() {
+    const { metrics, hydration, sleep, calorie } = plan;
+    const strip = document.getElementById('metrics-strip');
+    strip.innerHTML = `
+      <div class="metric-pill"><div class="metric-pill__value">${metrics.bmi || '—'}</div><div class="metric-pill__label">BMI<br/>${metrics.bmiClass.label}</div></div>
+      <div class="metric-divider"></div>
+      <div class="metric-pill"><div class="metric-pill__value">${calorie.adjustedTdee}</div><div class="metric-pill__label">Calorie<br/>Target (kcal)</div></div>
+      <div class="metric-divider"></div>
+      <div class="metric-pill"><div class="metric-pill__value">${hydration.liters}L</div><div class="metric-pill__label">Daily<br/>Water</div></div>
+      <div class="metric-divider"></div>
+      <div class="metric-pill"><div class="metric-pill__value">${sleep.label}</div><div class="metric-pill__label">Recommended<br/>Sleep</div></div>
+      <div class="metric-divider"></div>
+      <div class="metric-pill"><div class="metric-pill__value">${activeProfile.age}</div><div class="metric-pill__label">Age<br/>(years)</div></div>
+      <div class="metric-divider"></div>
+      <div class="metric-pill"><div class="metric-pill__value">${activeProfile.weight}kg</div><div class="metric-pill__label">Weight</div></div>
+    `;
+  }
+
+  function renderDiet() {
+    const { diet } = plan;
+    const mealIcons = { breakfast: '🌅', lunch: '☀️', snack: '🍊', dinner: '🌙' };
+    const mealLabels = { breakfast: 'Breakfast', lunch: 'Lunch', snack: 'Snack', dinner: 'Dinner' };
+
+    let html = `<div class="rec-section">
+      <div class="rec-section-title">🍎 Your Personalized Meal Plan
+        <span class="badge badge--primary" style="margin-left:auto">${activeProfile.dietPreference}</span>
+      </div>`;
+
+    Object.entries(diet).forEach(([mealType, foods]) => {
+      if (!foods || foods.length === 0) return;
+      html += `
+        <div class="meal-group">
+          <div class="meal-group__title">${mealIcons[mealType]} ${mealLabels[mealType]}</div>
+          <div class="foods-grid">
+            ${foods.map(food => `
+              <div class="food-card">
+                <div class="food-card__header">
+                  <div class="food-card__name">${food.name}</div>
+                  <span class="badge badge--muted">${food.calories} kcal</span>
+                </div>
+                <div style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-bottom:var(--space-2)">${food.description}</div>
+                <div class="food-card__macros">
+                  <div class="food-macro">🥩 <strong>${food.protein}g</strong> protein</div>
+                  <div class="food-macro">🍞 <strong>${food.carbs}g</strong> carbs</div>
+                  <div class="food-macro">🧈 <strong>${food.fat}g</strong> fat</div>
+                </div>
+                <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-2)">📦 ${food.portion}</div>
+                <div class="rec-item__reason">${food._reason || ''}</div>
+                ${food.allergens && food.allergens.length > 0 ? `<div style="font-size:10px;color:var(--color-warning);margin-top:4px">⚠ Contains: ${food.allergens.join(', ')}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    });
+
+    html += `<div class="alert alert--success mt-4">
+      <span class="alert__icon">💡</span>
+      <div class="alert__body">
+        <strong>Daily Calorie Target:</strong> ~${plan.calorie.adjustedTdee} kcal/day
+        (BMR: ${plan.calorie.bmr} kcal, TDEE: ${plan.calorie.tdee} kcal, adjusted for your ${activeProfile.goal.replace('_',' ')} goal).
+        Calculated using the Mifflin-St Jeor formula.
+      </div>
+    </div></div>`;
+
+    document.getElementById('diet-content').innerHTML = html;
+  }
+
+  function renderExercise() {
+    const { exercise } = plan;
+    const intensityColor = { low: 'badge--primary', moderate: 'badge--warning', high: 'badge--danger' };
+    const typeIcons = { cardio: '🏃', strength: '💪', flexibility: '🧘', sport: '⚽', yoga: '🧘' };
+
+    let html = `<div class="rec-section">
+      <div class="rec-section-title">🏋️ Exercise Recommendations</div>
+      <div class="grid grid-auto">
+        ${exercise.map(ex => `
+          <div class="exercise-card">
+            <div class="exercise-card__header">
+              <div>
+                <div class="exercise-card__name">${typeIcons[ex.type] || '🏃'} ${ex.name}</div>
+              </div>
+              <span class="badge ${intensityColor[ex.intensity] || 'badge--muted'}">${ex.intensity}</span>
+            </div>
+            <div class="exercise-card__meta">
+              <span class="badge badge--muted">⏱ ${ex.duration} min</span>
+              <span class="badge badge--muted">📅 ${ex.frequency}</span>
+              <span class="badge badge--muted">🔥 ~${ex.caloriesBurned} kcal</span>
+              <span class="badge badge--muted">${ex.equipment}</span>
+            </div>
+            <div class="exercise-card__desc">${ex.description}</div>
+            <div class="exercise-card__instructions">📋 ${ex.instructions}</div>
+            <div class="rec-item__reason">${ex._reason || ''}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+
+    document.getElementById('exercise-content').innerHTML = html;
+  }
+
+  function renderYoga() {
+    const { yoga } = plan;
+    const diffColor = { beginner: 'badge--primary', intermediate: 'badge--warning', advanced: 'badge--danger' };
+
+    let html = `<div class="rec-section">
+      <div class="rec-section-title">🧘 Yoga & Mindfulness Plan</div>
+      <div class="grid grid-auto">
+        ${yoga.map(pose => `
+          <div class="yoga-card">
+            <div class="flex justify-between items-start mb-3">
+              <div style="font-weight:600;font-size:var(--text-base)">${pose.name}</div>
+              <span class="badge ${diffColor[pose.difficulty] || 'badge--muted'}">${pose.difficulty}</span>
+            </div>
+            <div style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-bottom:var(--space-2)">${pose.description}</div>
+            <div class="flex gap-2 flex-wrap mb-3">
+              <span class="badge badge--muted">⏱ ${pose.duration >= 60 ? Math.round(pose.duration/60)+'min' : pose.duration+'s'}</span>
+              ${pose.purpose.map(p => `<span class="badge badge--muted">${p}</span>`).join('')}
+            </div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-muted);border-top:1px solid var(--color-border);padding-top:var(--space-2)">
+              📋 ${pose.instructions}
+            </div>
+            <div class="rec-item__reason">${pose._reason || ''}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="alert alert--info mt-4">
+        <span class="alert__icon">🧘</span>
+        <div class="alert__body">Always listen to your body. Never force a stretch. If you experience pain, stop immediately. These are general suggestions — consider professional yoga instruction for learning new poses.</div>
+      </div>
+    </div>`;
+
+    document.getElementById('yoga-content').innerHTML = html;
+  }
+
+  function renderHydration() {
+    const { hydration } = plan;
+    document.getElementById('hydration-content').innerHTML = `
+      <div class="rec-section">
+        <div class="rec-section-title">💧 Hydration Plan</div>
+        <div class="hydration-card mb-6">
+          <div class="hydration-number">${hydration.liters}L</div>
+          <div style="font-size:var(--text-base);color:var(--color-secondary);font-weight:600;margin-top:var(--space-2)">Daily Water Target</div>
+          <div style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-top:var(--space-2)">
+            ${hydration.ml.toLocaleString()} ml · approx. ${hydration.glasses} glasses (250ml each)
+          </div>
+        </div>
+        <div class="grid grid-2 gap-4">
+          <div class="card">
+            <div class="card__title mb-3">💡 How to reach your target</div>
+            <ul style="display:flex;flex-direction:column;gap:var(--space-2);">
+              <li class="text-sm">🌅 Start your day with 1–2 glasses of water</li>
+              <li class="text-sm">🍵 Herbal teas and coconut water count!</li>
+              <li class="text-sm">🥗 Many fruits & vegetables contribute to hydration</li>
+              <li class="text-sm">💪 Drink extra during and after exercise</li>
+              <li class="text-sm">☀️ Increase intake in hot weather</li>
+              <li class="text-sm">🎯 Track using our Quick Log on the Dashboard</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card__title mb-3">📊 Hydration breakdown</div>
+            <div class="stat-card__value" style="font-size:var(--text-xl)">${Math.round(hydration.ml / 8)} ml</div>
+            <div class="text-muted text-sm mt-1">Per glass (8 glasses/day goal)</div>
+            <div class="divider"></div>
+            <div class="text-sm"><strong>Formula used:</strong> ${activeProfile.gender === 'child' ? '40' : activeProfile.gender === 'men' ? '35' : '31'}ml × ${activeProfile.weight}kg body weight + activity adjustment</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSleep() {
+    const { sleep } = plan;
+    document.getElementById('sleep-content').innerHTML = `
+      <div class="rec-section">
+        <div class="rec-section-title">😴 Sleep & Recovery</div>
+        <div class="grid grid-2 gap-6 mb-6">
+          <div class="card text-center">
+            <div style="font-size:3rem;margin-bottom:var(--space-3)">😴</div>
+            <div class="stat-card__value">${sleep.label}</div>
+            <div class="text-muted text-sm mt-1">Recommended Sleep Duration</div>
+            <div class="text-xs text-muted mt-2">Based on age ${activeProfile.age} · National Sleep Foundation guidelines</div>
+          </div>
+          <div class="card">
+            <div class="card__title mb-3">🌙 Sleep Hygiene Tips</div>
+            <ul style="display:flex;flex-direction:column;gap:var(--space-2);">
+              <li class="text-sm">📵 Avoid screens 60 minutes before bedtime</li>
+              <li class="text-sm">🌡️ Keep bedroom cool and dark</li>
+              <li class="text-sm">⏰ Maintain consistent sleep/wake times</li>
+              <li class="text-sm">☕ Avoid caffeine after 2 PM</li>
+              <li class="text-sm">🧘 Wind down with breathing exercises or stretching</li>
+              <li class="text-sm">📱 Use the WellSync progress tracker to log your sleep</li>
+            </ul>
+          </div>
+        </div>
+        <div class="alert alert--info">
+          <span class="alert__icon">ℹ️</span>
+          <div class="alert__body">Sleep quality is as important as duration. If you experience persistent sleep issues, please consult a qualified healthcare professional.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderLifestyle() {
+    const { lifestyle } = plan;
+    document.getElementById('lifestyle-content').innerHTML = `
+      <div class="rec-section">
+        <div class="rec-section-title">🌿 Lifestyle & Wellness Tips</div>
+        <div class="lifestyle-grid">
+          ${lifestyle.map((tip, i) => `
+            <div class="tip-card animate-fadeIn" style="animation-delay:${i*60}ms">
+              <div style="font-size:1.1rem;margin-bottom:var(--space-2)">✨ Tip ${i+1}</div>
+              ${tip}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCycle() {
+    const cycleBtn = document.getElementById('cycle-tab-btn');
+    const cycleContainer = document.getElementById('cycle-content');
+    if (!cycleBtn || !cycleContainer) return;
+
+    // Only show for women with cycle data
+    if (activeProfile.gender !== 'women' || !activeProfile.cycleData?.lastPeriodDate) return;
+
+    // Show the tab button
+    cycleBtn.style.display = '';
+
+    const { lastPeriodDate, cycleLength = 28, symptoms = [], mood, energyLevel } = activeProfile.cycleData;
+    const last = new Date(lastPeriodDate);
+    const today = new Date();
+    const daysSinceLast = Math.floor((today - last) / 86400000);
+    const nextPeriod = new Date(last);
+    nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+    const daysToNext = Math.ceil((nextPeriod - today) / 86400000);
+
+    let phaseLabel, phaseEmoji, phaseColor, phaseDays, phaseTips, phaseExercise, phaseFoods;
+    if (daysSinceLast <= 5) {
+      phaseLabel = 'Menstruation Phase'; phaseEmoji = '🏷️'; phaseColor = 'hsl(0,60%,55%)';
+      phaseDays = 'Days 1–5 (estimated)';
+      phaseTips = ['Stay well-hydrated — aim for 2.5–3L of water.', 'Gentle yoga (Child\'s Pose, Legs Up the Wall) may provide comfort.', 'Iron-rich foods: spinach, dal, lentils, ragi support healthy iron levels.', 'A warm compress may ease lower abdominal discomfort.', 'Rest is important — honor your body\'s energy signals.'];
+      phaseExercise = ['Gentle walking', 'Yin yoga', 'Light stretching', 'Rest'];
+      phaseFoods = ['Spinach', 'Lentils', 'Bananas', 'Ginger tea', 'Dark chocolate', 'Salmon'];
+    } else if (daysSinceLast <= 13) {
+      phaseLabel = 'Follicular Phase'; phaseEmoji = '🌱'; phaseColor = 'hsl(152,55%,42%)';
+      phaseDays = 'Days 6–13 (estimated)';
+      phaseTips = ['Energy is rising — great time for higher-intensity exercise.', 'Focus on antioxidant-rich foods: berries, leafy greens, bell peppers.', 'Include omega-3s (flaxseeds, walnuts) for hormonal balance.', 'Good phase for setting new goals and trying new activities.', 'Maintain consistent sleep schedule.'];
+      phaseExercise = ['Cardio', 'Strength training', 'HIIT', 'Dancing', 'Running'];
+      phaseFoods = ['Berries', 'Avocado', 'Eggs', 'Broccoli', 'Quinoa', 'Almonds'];
+    } else if (daysSinceLast <= 17) {
+      phaseLabel = 'Ovulation Phase'; phaseEmoji = '✨'; phaseColor = 'hsl(38,85%,52%)';
+      phaseDays = 'Days 14–17 (estimated)';
+      phaseTips = ['Peak energy — push your workouts a bit harder if you feel good.', 'Focus on zinc-rich foods for hormonal support.', 'Great time for social activities and collaboration.', 'Stay hydrated, especially during intense exercise.', 'Listen to your body and avoid overtraining.'];
+      phaseExercise = ['High-intensity cardio', 'Circuit training', 'Outdoor activities', 'Group fitness'];
+      phaseFoods = ['Quinoa', 'Chickpeas', 'Pumpkin seeds', 'Leafy greens', 'Tomatoes', 'Flaxseeds'];
+    } else {
+      phaseLabel = 'Luteal Phase'; phaseEmoji = '🌙'; phaseColor = 'hsl(265,45%,60%)';
+      phaseDays = 'Days 18–' + cycleLength + ' (estimated)';
+      phaseTips = ['Energy may decrease — gentle exercise is supportive.', 'Magnesium-rich foods (dark chocolate, nuts, seeds) may help reduce PMS symptoms.', 'Reduce caffeine and salt intake to manage bloating.', 'Prioritize quality sleep and stress management.', 'Gentle yoga and breathing exercises can be calming.'];
+      phaseExercise = ['Yoga', 'Pilates', 'Walking', 'Light swimming', 'Gentle stretching'];
+      phaseFoods = ['Dark chocolate', 'Sweet potato', 'Nuts', 'Whole grains', 'Chamomile tea', 'Leafy greens'];
+    }
+
+    cycleContainer.innerHTML = `
+      <div class="rec-section">
+        <div class="rec-section-title">🌸 Cycle Phase — ${phaseLabel}</div>
+
+        
+        <div class="card mb-6" style="border-left:4px solid ${phaseColor};background:${phaseColor.replace('hsl', 'hsla').replace(')', ',0.05)')}">
+          <div class="flex items-center gap-4">
+            <div style="font-size:3rem">${phaseEmoji}</div>
+            <div>
+              <div style="font-weight:700;font-size:var(--text-xl);color:${phaseColor}">${phaseLabel}</div>
+              <div class="text-sm text-muted mt-1">${phaseDays}</div>
+              <div class="flex gap-3 mt-2 flex-wrap">
+                <span class="badge badge--women">📅 Day ${daysSinceLast} of cycle</span>
+                ${daysToNext > 0 ? `<span class="badge badge--muted">Next period ~${daysToNext} day${daysToNext!==1?'s':''}</span>` : '<span class="badge badge--danger">Period expected soon</span>'}
+                <span class="badge badge--muted">Cycle: ${cycleLength} days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="grid grid-2 gap-6 mb-6">
+          <div class="card">
+            <div class="card__title mb-3">💡 Phase Wellness Tips</div>
+            <ul style="display:flex;flex-direction:column;gap:var(--space-2)">
+              ${phaseTips.map(t => `<li class="text-sm">• ${t}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card__title mb-3">🏋️ Recommended Activities</div>
+            <div class="flex flex-wrap gap-2 mb-4">
+              ${phaseExercise.map(ex => `<span class="badge badge--primary">${ex}</span>`).join('')}
+            </div>
+            <div class="card__title mb-3">🥗 Supportive Foods</div>
+            <div class="flex flex-wrap gap-2">
+              ${phaseFoods.map(f => `<span class="badge badge--success">${f}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        ${symptoms.length > 0 ? `
+        <div class="card mb-4">
+          <div class="card__title mb-2">📝 Your Logged Symptoms</div>
+          <div class="flex flex-wrap gap-2">
+            ${symptoms.map(s => `<span class="badge badge--women">${s.replace('_', ' ')}</span>`).join('')}
+          </div>
+        </div>` : ''}
+
+        <div class="alert alert--info">
+          <span class="alert__icon">⚕️</span>
+          <div class="alert__body">These are general wellness suggestions based on typical cycle phases. Individual experiences vary. If you experience unusual or severe symptoms, consult a qualified healthcare professional.</div>
+        </div>
+
+        <a href="menstrual.html" class="btn btn--primary mt-4">🌸 Full Cycle Wellness Details →</a>
+      </div>
+    `;
+  }
+
+  function initTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        const tabId = `tab-${btn.dataset.tab}`;
+        document.getElementById(tabId)?.classList.add('active');
+      });
+    });
+  }
+  </script>
+
+  
+  <div id="no-profile-modal" role="dialog" aria-modal="true" aria-labelledby="np-modal-title">
+    <div class="no-profile-backdrop"></div>
+    <div class="no-profile-dialog">
+      <div class="no-profile-icon">👤</div>
+      <h2 class="no-profile-title" id="np-modal-title">No Profile Found</h2>
+      <p class="no-profile-msg">
+        You need a wellness profile to see recommendations.<br/>
+        Create one and we'll generate a fully personalized plan for you.
+      </p>
+      <a href="profile.html" class="btn btn--primary" style="width:100%;justify-content:center;font-size:var(--text-base);padding:var(--space-4);">
+        👤 Create My Profile
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>
