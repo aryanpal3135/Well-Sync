@@ -1,0 +1,158 @@
+
+
+@media (max-width: 768px) {
+  :root {
+    --nav-height: 60px;
+    --text-3xl: 1.875rem;
+    --text-2xl: 1.5rem;
+    --text-xl:  1.25rem;
+  }
+
+  .container { padding: 0 var(--space-4); }
+
+  
+  .navbar__nav { display: none; }
+  .navbar__burger { display: flex; }
+
+  
+  .hero { padding-top: var(--space-20); }
+  .hero__stats { grid-template-columns: repeat(3, 1fr); }
+
+  
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-auto { grid-template-columns: 1fr; }
+
+  
+  .type-selector-grid { grid-template-columns: 1fr; }
+  .profile-card__items { display: none; }
+
+  
+  .plan-grid { grid-template-columns: 1fr; }
+  .stat-cards-grid { grid-template-columns: repeat(2, 1fr); }
+
+  
+  .charts-grid { grid-template-columns: 1fr; }
+
+  
+  .tabs { overflow-x: auto; padding: var(--space-1); }
+  .tab-btn { font-size: var(--text-xs); padding: var(--space-2) var(--space-3); }
+
+  
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-panel--brand { display: none; }
+  .auth-panel--form { padding: var(--space-6) var(--space-4); justify-content: flex-start; padding-top: var(--space-10); }
+  #mobile-logo { display: flex !important; }
+
+  
+  .dashboard-header { flex-direction: column; align-items: flex-start; }
+  .dashboard-header__actions { flex-wrap: wrap; }
+
+  
+  .quick-log-grid { grid-template-columns: 1fr; }
+
+  
+  .score-ring { width: 110px; height: 110px; }
+
+  
+  .footer-bottom-inner { flex-direction: column; text-align: center; }
+  .footer-bottom-links { justify-content: center; }
+
+  
+  .metrics-strip { overflow-x: auto; }
+  .metric-divider { display: none; }
+
+  
+  .phase-grid { grid-template-columns: 1fr; }
+  .cycle-tracker-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .hero__cta { flex-direction: column; align-items: center; }
+  .hero__cta .btn { width: 100%; max-width: 320px; }
+
+  .stat-cards-grid { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr; }
+
+  .goal-options { flex-direction: column; }
+  .goal-option-btn { width: 100%; }
+
+  .hero__stats { gap: var(--space-4); }
+
+  .dashboard-header__actions { flex-direction: column; width: 100%; }
+  .dashboard-header__actions .btn { width: 100%; }
+
+  .navbar__logo-icon { width: 30px; height: 30px; font-size: 0.9rem; }
+  .navbar__logo { font-size: var(--text-base); }
+
+  .tabs { gap: 2px; }
+  .tab-btn { padding: var(--space-2); font-size: 11px; }
+
+  .auth-form-wrapper { padding: 0; }
+
+  .cycle-calendar { gap: 2px; }
+  .cycle-day { font-size: 10px; }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-cards-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .auth-panel--brand { display: none; }
+  .auth-panel--form { max-width: 100%; }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --container-xl: 1320px;
+  }
+
+  .hero__title { font-size: var(--text-5xl); }
+}
+
+@media print {
+  .navbar, .navbar__mobile-drawer, footer, .btn,
+  #toast-container, .quick-log-card { display: none !important; }
+
+  .main-content { padding-top: var(--space-4); }
+  .card { box-shadow: none; border: 1px solid #ccc; }
+  body { background: white; color: black; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .btn--primary {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+html {
+  scroll-padding-top: calc(var(--nav-height) + var(--space-4));
+}
