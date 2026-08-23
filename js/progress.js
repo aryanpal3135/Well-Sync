@@ -74,10 +74,12 @@ function renderLogForm() {
       note,
     });
 
-    Toast.show('Activity logged! 🎉', 'success');
-    form.reset();
-    document.getElementById('log-unit').textContent = 'unit';
-    renderRecentLogs();
+Toast.show('Activity logged! 🎉', 'success');
+form.reset();
+document.getElementById('log-unit').textContent = 'unit';
+renderRecentLogs();
+renderCharts();
+if (window.renderWeekSummary) window.renderWeekSummary();
   });
 }
 
@@ -118,6 +120,7 @@ function deleteLog(logId) {
   Toast.show('Log entry removed.', 'info');
   renderRecentLogs();
   renderCharts();
+  if (window.renderWeekSummary) window.renderWeekSummary();
 }
 
 window.deleteLog = deleteLog;
