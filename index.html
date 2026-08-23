@@ -313,12 +313,10 @@
   <script src="js/auth.js"></script>
   <script>
     'use strict';
-    // Redirect to dashboard if already logged in
     if (Auth.isLoggedIn()) {
       window.location.href = 'dashboard.html';
     }
 
-    // Navbar scroll effect
     const nav = document.getElementById('landing-nav');
     window.addEventListener('scroll', () => {
       nav.classList.toggle('scrolled', window.scrollY > 60);
