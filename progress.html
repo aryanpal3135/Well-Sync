@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Progress Tracking – WellSync</title>
+  <meta name="description" content="Track your health and wellness progress with charts and logs on WellSync." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <style>
+    .log-form-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-sm); }
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); }
+    .log-table { display: flex; flex-direction: column; gap: var(--space-2); }
+    .stats-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6); }
+    @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    /* ── No-Profile Modal ──────────────────────────────── */
+    #no-profile-modal {
+      display: none;
+      position: fixed; inset: 0; z-index: 9999;
+      align-items: center; justify-content: center;
+    }
+    #no-profile-modal.show { display: flex; }
+    .no-profile-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(10,15,30,0.6);
+      backdrop-filter: blur(6px);
+      animation: npFadeIn 0.25s ease;
+    }
+    .no-profile-dialog {
+      position: relative; z-index: 1;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      padding: var(--space-10) var(--space-8);
+      width: 100%; max-width: 440px;
+      margin: var(--space-4);
+      text-align: center;
+      animation: npSlideUp 0.28s cubic-bezier(.34,1.4,.64,1);
+    }
+    .no-profile-icon { font-size: 3.5rem; margin-bottom: var(--space-4); }
+    .no-profile-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--weight-bold);
+      margin-bottom: var(--space-3);
+    }
+    .no-profile-msg {
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin-bottom: var(--space-6);
+    }
+    @keyframes npFadeIn  { from { opacity:0 } to { opacity:1 } }
+    @keyframes npSlideUp { from { opacity:0; transform:translateY(28px) scale(.96) } to { opacity:1; transform:none } }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container navbar__inner">
+      <a href="dashboard.html" class="navbar__logo"><div class="navbar__logo-icon">🌿</div>WellSync</a>
+      <div class="navbar__nav">
+        <a href="dashboard.html" class="navbar__link">📊 Dashboard</a>
+        <a href="profile.html" class="navbar__link">👤 Profile</a>
+        <a href="recommendations.html" class="navbar__link">💡 Recommendations</a>
+        <a href="progress.html" class="navbar__link active">📈 Progress</a>
+        <a href="menstrual.html" class="navbar__link" id="cycle-nav-link" style="display:none">🌸 Cycle</a>
+      </div>
+      <div class="navbar__actions">
+        <button class="btn btn--ghost btn--sm" data-action="logout">↩ Logout</button>
+        <button class="navbar__burger" id="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="navbar__mobile-drawer" id="mobile-drawer">
+    <a href="dashboard.html" class="navbar__link">📊 Dashboard</a>
+    <a href="profile.html" class="navbar__link">👤 Profile</a>
+    <a href="recommendations.html" class="navbar__link">💡 Recommendations</a>
+    <a href="progress.html" class="navbar__link active">📈 Progress</a>
+    <a href="menstrual.html" class="navbar__link" id="cycle-nav-link-mobile" style="display:none">🌸 Cycle</a>
+    <button class="btn btn--ghost btn--sm" data-action="logout">↩ Logout</button>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+
+      <div class="mb-6">
+        <h1 style="font-family:var(--font-heading);font-size:var(--text-2xl);font-weight:var(--weight-bold);">📈 Progress Tracking</h1>
+        <p class="text-muted text-sm mt-1">Log your daily activities and visualize your wellness journey over the past 7 days.</p>
+      </div>
+
+      
+      <div class="log-form-card mb-6">
+        <h2 class="section-title" style="margin-bottom:var(--space-4)">✏️ Log an Activity</h2>
+        <form id="log-form">
+          <div class="grid grid-2 gap-4">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="log-type">Activity Type <span class="required">*</span></label>
+              <select class="form-select" id="log-type" name="type" required>
+                <option value="">Select activity…</option>
+                <option value="water">💧 Water Intake</option>
+                <option value="sleep">😴 Sleep</option>
+                <option value="exercise">🏋️ Exercise Session</option>
+                <option value="meal">🍎 Meal Followed</option>
+                <option value="yoga">🧘 Yoga / Mindfulness</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="log-value">Value <span class="required">*</span></label>
+              <div class="flex gap-2">
+                <input class="form-input" type="number" id="log-value" name="value" placeholder="Enter amount" min="0" step="any" style="flex:1" required />
+                <span id="log-unit" class="badge badge--muted" style="align-self:center;white-space:nowrap;padding:var(--space-3)">unit</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group mt-4" style="margin-bottom:0">
+            <label class="form-label" for="log-note">Note (optional)</label>
+            <input class="form-input" type="text" id="log-note" name="note" placeholder="e.g., Morning run, slept well…" />
+          </div>
+          <button type="submit" class="btn btn--primary mt-4">Save Log Entry</button>
+        </form>
+      </div>
+
+      
+      <div class="section-title">📊 This Week's Summary</div>
+      <div class="stats-summary stagger" id="weekly-summary">
+        <div class="stat-card"><div class="spinner"></div></div>
+        <div class="stat-card"><div class="spinner"></div></div>
+        <div class="stat-card"><div class="spinner"></div></div>
+        <div class="stat-card"><div class="spinner"></div></div>
+      </div>
+
+      
+      <div class="section-title">🗂️ Recent Log Entries</div>
+      <div class="card">
+        <div id="recent-logs"><div class="spinner"></div></div>
+      </div>
+
+      
+      <div id="cycle-progress-section"></div>
+
+      
+      <div class="alert alert--info mt-6">
+        <span class="alert__icon">⚕️</span>
+        <div class="alert__body">Progress data is stored locally in your browser. The Wellness Score is an educational tracking tool, not a medical measurement. Consult a healthcare professional for medical assessments.</div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/recommendationEngine.js"></script>
+  <script src="js/progress.js"></script>
+  <script>
+    // Dynamic unit label
+    document.getElementById('log-type').addEventListener('change', function() {
+      const units = { water: 'ml', sleep: 'hours', exercise: 'minutes', meal: 'meals', yoga: 'minutes' };
+      document.getElementById('log-unit').textContent = units[this.value] || 'unit';
+    });
+
+    // Weekly summary + cycle section
+    document.addEventListener('DOMContentLoaded', () => {
+      const user    = Auth.getCurrentUser();
+      const profile = Storage.getActiveProfile(user?.id);
+      if (!user || !profile) return;
+
+      const weekLogs = Storage.getLogsForPastDays(user.id, 7);
+      const totalWater = weekLogs.filter(l => l.type === 'water').reduce((s,l) => s+l.value, 0);
+      const totalExercise = weekLogs.filter(l => l.type === 'exercise').length;
+      const sleepLogs = weekLogs.filter(l => l.type === 'sleep');
+      const avgSleep = sleepLogs.length ? (sleepLogs.reduce((s,l) => s+l.value, 0) / sleepLogs.length).toFixed(1) : '—';
+      const yogaSessions = weekLogs.filter(l => l.type === 'yoga').length;
+
+      document.getElementById('weekly-summary').innerHTML = `
+        <div class="stat-card animate-fadeIn">
+          <div class="stat-card__icon" style="background:var(--color-secondary-light)">💧</div>
+          <div class="stat-card__value">${(totalWater/1000).toFixed(1)}L</div>
+          <div class="stat-card__label">Total Water (7 days)</div>
+        </div>
+        <div class="stat-card animate-fadeIn">
+          <div class="stat-card__icon" style="background:var(--color-primary-light)">🏋️</div>
+          <div class="stat-card__value">${totalExercise}</div>
+          <div class="stat-card__label">Exercise Sessions</div>
+        </div>
+        <div class="stat-card animate-fadeIn">
+          <div class="stat-card__icon" style="background:var(--color-accent-women-light)">😴</div>
+          <div class="stat-card__value">${avgSleep}h</div>
+          <div class="stat-card__label">Avg Sleep/Night</div>
+        </div>
+        <div class="stat-card animate-fadeIn">
+          <div class="stat-card__icon" style="background:var(--color-accent-child-light)">🧘</div>
+          <div class="stat-card__value">${yogaSessions}</div>
+          <div class="stat-card__label">Yoga Sessions</div>
+        </div>
+      `;
+
+      // ── Menstrual Cycle Section (Women only) ────────────────────
+      const cycleSection = document.getElementById('cycle-progress-section');
+      if (cycleSection && profile.gender === 'women' && profile.cycleData?.lastPeriodDate) {
+        const { lastPeriodDate, cycleLength = 28 } = profile.cycleData;
+        const last = new Date(lastPeriodDate);
+        const today = new Date();
+        const daysSinceLast = Math.floor((today - last) / 86400000);
+        const nextPeriod = new Date(last);
+        nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+        const daysToNext = Math.ceil((nextPeriod - today) / 86400000);
+
+        let phaseLabel, phaseEmoji, phaseNote, phaseColor;
+        if (daysSinceLast <= 5) {
+          phaseLabel = 'Menstruation Phase'; phaseEmoji = '🏷️'; phaseColor = 'hsl(0,60%,55%)';
+          phaseNote = 'Focus on gentle movement, hydration, and iron-rich foods. Rest is important.';
+        } else if (daysSinceLast <= 13) {
+          phaseLabel = 'Follicular Phase'; phaseEmoji = '🌱'; phaseColor = 'hsl(152,55%,42%)';
+          phaseNote = 'Energy is building — a great time to try higher-intensity workouts.';
+        } else if (daysSinceLast <= 17) {
+          phaseLabel = 'Ovulation Phase'; phaseEmoji = '✨'; phaseColor = 'hsl(38,85%,52%)';
+          phaseNote = 'Peak energy phase — you may feel most motivated and energetic.';
+        } else {
+          phaseLabel = 'Luteal Phase'; phaseEmoji = '🌙'; phaseColor = 'hsl(265,45%,60%)';
+          phaseNote = 'Energy may decrease. Gentle yoga and rest are supportive.';
+        }
+
+        cycleSection.innerHTML = `
+          <div class="section-title mt-6">🌸 Cycle Wellness</div>
+          <div class="card mb-6" style="border-left:4px solid ${phaseColor}">
+            <div class="flex items-center gap-4">
+              <div style="font-size:2.5rem">${phaseEmoji}</div>
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:var(--text-lg);color:${phaseColor}">${phaseLabel}</div>
+                <div class="text-sm text-muted mt-1">${phaseNote}</div>
+                <div class="flex gap-3 mt-3 flex-wrap">
+                  <span class="badge badge--women">📅 Day ${daysSinceLast} of cycle</span>
+                  ${daysToNext > 0 ? `<span class="badge badge--muted">Next period ~${daysToNext} day${daysToNext !== 1 ? 's' : ''}</span>` : '<span class="badge badge--danger">Period expected soon</span>'}
+                  <span class="badge badge--muted">Cycle length: ${cycleLength} days</span>
+                </div>
+              </div>
+              <a href="menstrual.html" class="btn btn--sm" style="border:1.5px solid ${phaseColor};color:${phaseColor};background:transparent;flex-shrink:0">🌸 Full Details</a>
+            </div>
+            <div class="text-xs text-muted mt-4" style="border-top:1px solid var(--color-border);padding-top:var(--space-3)">
+              ⚕️ Cycle phase is estimated based on your last period date. This is not medical advice.
+            </div>
+          </div>
+        `;
+      }
+    });
+  </script>
+
+  
+  <div id="no-profile-modal" role="dialog" aria-modal="true" aria-labelledby="np-modal-title">
+    <div class="no-profile-backdrop"></div>
+    <div class="no-profile-dialog">
+      <div class="no-profile-icon">👤</div>
+      <h2 class="no-profile-title" id="np-modal-title">No Profile Found</h2>
+      <p class="no-profile-msg">
+        You need a wellness profile to track progress.<br/>
+        Create one to start logging and visualizing your health journey.
+      </p>
+      <a href="profile.html" class="btn btn--primary" style="width:100%;justify-content:center;font-size:var(--text-base);padding:var(--space-4);">
+        👤 Create My Profile
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>
