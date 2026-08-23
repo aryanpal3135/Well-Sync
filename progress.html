@@ -157,97 +157,100 @@
   <script src="js/auth.js"></script>
   <script src="js/recommendationEngine.js"></script>
   <script src="js/progress.js"></script>
-  <script>
-    document.getElementById('log-type').addEventListener('change', function() {
-      const units = { water: 'ml', sleep: 'hours', exercise: 'minutes', meal: 'meals', yoga: 'minutes' };
-      document.getElementById('log-unit').textContent = units[this.value] || 'unit';
-    });
+ <script src="js/progress.js"></script>
+<script>
+  document.getElementById('log-type').addEventListener('change', function() {
+    const units = { water: 'ml', sleep: 'hours', exercise: 'minutes', meal: 'meals', yoga: 'minutes' };
+    document.getElementById('log-unit').textContent = units[this.value] || 'unit';
+  });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const user    = Auth.getCurrentUser();
-      const profile = Storage.getActiveProfile(user?.id);
-      if (!user || !profile) return;
+  function renderWeekSummary() {
+    const user    = Auth.getCurrentUser();
+    const profile = Storage.getActiveProfile(user?.id);
+    if (!user || !profile) return;
 
-      const weekLogs = Storage.getLogsForPastDays(user.id, 7);
-      const totalWater = weekLogs.filter(l => l.type === 'water').reduce((s,l) => s+l.value, 0);
-      const totalExercise = weekLogs.filter(l => l.type === 'exercise').length;
-      const sleepLogs = weekLogs.filter(l => l.type === 'sleep');
-      const avgSleep = sleepLogs.length ? (sleepLogs.reduce((s,l) => s+l.value, 0) / sleepLogs.length).toFixed(1) : '—';
-      const yogaSessions = weekLogs.filter(l => l.type === 'yoga').length;
+    const weekLogs = Storage.getLogsForPastDays(user.id, 7);
+    const totalWater = weekLogs.filter(l => l.type === 'water').reduce((s,l) => s+l.value, 0);
+    const totalExercise = weekLogs.filter(l => l.type === 'exercise').length;
+    const sleepLogs = weekLogs.filter(l => l.type === 'sleep');
+    const avgSleep = sleepLogs.length ? (sleepLogs.reduce((s,l) => s+l.value, 0) / sleepLogs.length).toFixed(1) : '—';
+    const yogaSessions = weekLogs.filter(l => l.type === 'yoga').length;
 
-      document.getElementById('weekly-summary').innerHTML = `
-        <div class="stat-card animate-fadeIn">
-          <div class="stat-card__icon" style="background:var(--color-secondary-light)">💧</div>
-          <div class="stat-card__value">${(totalWater/1000).toFixed(1)}L</div>
-          <div class="stat-card__label">Total Water (7 days)</div>
-        </div>
-        <div class="stat-card animate-fadeIn">
-          <div class="stat-card__icon" style="background:var(--color-primary-light)">🏋️</div>
-          <div class="stat-card__value">${totalExercise}</div>
-          <div class="stat-card__label">Exercise Sessions</div>
-        </div>
-        <div class="stat-card animate-fadeIn">
-          <div class="stat-card__icon" style="background:var(--color-accent-women-light)">😴</div>
-          <div class="stat-card__value">${avgSleep}h</div>
-          <div class="stat-card__label">Avg Sleep/Night</div>
-        </div>
-        <div class="stat-card animate-fadeIn">
-          <div class="stat-card__icon" style="background:var(--color-accent-child-light)">🧘</div>
-          <div class="stat-card__value">${yogaSessions}</div>
-          <div class="stat-card__label">Yoga Sessions</div>
+    document.getElementById('weekly-summary').innerHTML = `
+      <div class="stat-card animate-fadeIn">
+        <div class="stat-card__icon" style="background:var(--color-secondary-light)">💧</div>
+        <div class="stat-card__value">${(totalWater/1000).toFixed(1)}L</div>
+        <div class="stat-card__label">Total Water (7 days)</div>
+      </div>
+      <div class="stat-card animate-fadeIn">
+        <div class="stat-card__icon" style="background:var(--color-primary-light)">🏋️</div>
+        <div class="stat-card__value">${totalExercise}</div>
+        <div class="stat-card__label">Exercise Sessions</div>
+      </div>
+      <div class="stat-card animate-fadeIn">
+        <div class="stat-card__icon" style="background:var(--color-accent-women-light)">😴</div>
+        <div class="stat-card__value">${avgSleep}h</div>
+        <div class="stat-card__label">Avg Sleep/Night</div>
+      </div>
+      <div class="stat-card animate-fadeIn">
+        <div class="stat-card__icon" style="background:var(--color-accent-child-light)">🧘</div>
+        <div class="stat-card__value">${yogaSessions}</div>
+        <div class="stat-card__label">Yoga Sessions</div>
+      </div>
+    `;
+
+    const cycleSection = document.getElementById('cycle-progress-section');
+    if (cycleSection && profile.gender === 'women' && profile.cycleData?.lastPeriodDate) {
+      const { lastPeriodDate, cycleLength = 28 } = profile.cycleData;
+      const last = new Date(lastPeriodDate);
+      const today = new Date();
+      const daysSinceLast = Math.floor((today - last) / 86400000);
+      const nextPeriod = new Date(last);
+      nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+      const daysToNext = Math.ceil((nextPeriod - today) / 86400000);
+
+      let phaseLabel, phaseEmoji, phaseNote, phaseColor;
+      if (daysSinceLast <= 5) {
+        phaseLabel = 'Menstruation Phase'; phaseEmoji = '🏷️'; phaseColor = 'hsl(0,60%,55%)';
+        phaseNote = 'Focus on gentle movement, hydration, and iron-rich foods. Rest is important.';
+      } else if (daysSinceLast <= 13) {
+        phaseLabel = 'Follicular Phase'; phaseEmoji = '🌱'; phaseColor = 'hsl(152,55%,42%)';
+        phaseNote = 'Energy is building — a great time to try higher-intensity workouts.';
+      } else if (daysSinceLast <= 17) {
+        phaseLabel = 'Ovulation Phase'; phaseEmoji = '✨'; phaseColor = 'hsl(38,85%,52%)';
+        phaseNote = 'Peak energy phase — you may feel most motivated and energetic.';
+      } else {
+        phaseLabel = 'Luteal Phase'; phaseEmoji = '🌙'; phaseColor = 'hsl(265,45%,60%)';
+        phaseNote = 'Energy may decrease. Gentle yoga and rest are supportive.';
+      }
+
+      cycleSection.innerHTML = `
+        <div class="section-title mt-6">🌸 Cycle Wellness</div>
+        <div class="card mb-6" style="border-left:4px solid ${phaseColor}">
+          <div class="flex items-center gap-4">
+            <div style="font-size:2.5rem">${phaseEmoji}</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:var(--text-lg);color:${phaseColor}">${phaseLabel}</div>
+              <div class="text-sm text-muted mt-1">${phaseNote}</div>
+              <div class="flex gap-3 mt-3 flex-wrap">
+                <span class="badge badge--women">📅 Day ${daysSinceLast} of cycle</span>
+                ${daysToNext > 0 ? `<span class="badge badge--muted">Next period ~${daysToNext} day${daysToNext !== 1 ? 's' : ''}</span>` : '<span class="badge badge--danger">Period expected soon</span>'}
+                <span class="badge badge--muted">Cycle length: ${cycleLength} days</span>
+              </div>
+            </div>
+            <a href="menstrual.html" class="btn btn--sm" style="border:1.5px solid ${phaseColor};color:${phaseColor};background:transparent;flex-shrink:0">🌸 Full Details</a>
+          </div>
+          <div class="text-xs text-muted mt-4" style="border-top:1px solid var(--color-border);padding-top:var(--space-3)">
+            ⚕️ Cycle phase is estimated based on your last period date. This is not medical advice.
+          </div>
         </div>
       `;
+    }
+  }
 
-      const cycleSection = document.getElementById('cycle-progress-section');
-      if (cycleSection && profile.gender === 'women' && profile.cycleData?.lastPeriodDate) {
-        const { lastPeriodDate, cycleLength = 28 } = profile.cycleData;
-        const last = new Date(lastPeriodDate);
-        const today = new Date();
-        const daysSinceLast = Math.floor((today - last) / 86400000);
-        const nextPeriod = new Date(last);
-        nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
-        const daysToNext = Math.ceil((nextPeriod - today) / 86400000);
-
-        let phaseLabel, phaseEmoji, phaseNote, phaseColor;
-        if (daysSinceLast <= 5) {
-          phaseLabel = 'Menstruation Phase'; phaseEmoji = '🏷️'; phaseColor = 'hsl(0,60%,55%)';
-          phaseNote = 'Focus on gentle movement, hydration, and iron-rich foods. Rest is important.';
-        } else if (daysSinceLast <= 13) {
-          phaseLabel = 'Follicular Phase'; phaseEmoji = '🌱'; phaseColor = 'hsl(152,55%,42%)';
-          phaseNote = 'Energy is building — a great time to try higher-intensity workouts.';
-        } else if (daysSinceLast <= 17) {
-          phaseLabel = 'Ovulation Phase'; phaseEmoji = '✨'; phaseColor = 'hsl(38,85%,52%)';
-          phaseNote = 'Peak energy phase — you may feel most motivated and energetic.';
-        } else {
-          phaseLabel = 'Luteal Phase'; phaseEmoji = '🌙'; phaseColor = 'hsl(265,45%,60%)';
-          phaseNote = 'Energy may decrease. Gentle yoga and rest are supportive.';
-        }
-
-        cycleSection.innerHTML = `
-          <div class="section-title mt-6">🌸 Cycle Wellness</div>
-          <div class="card mb-6" style="border-left:4px solid ${phaseColor}">
-            <div class="flex items-center gap-4">
-              <div style="font-size:2.5rem">${phaseEmoji}</div>
-              <div style="flex:1">
-                <div style="font-weight:700;font-size:var(--text-lg);color:${phaseColor}">${phaseLabel}</div>
-                <div class="text-sm text-muted mt-1">${phaseNote}</div>
-                <div class="flex gap-3 mt-3 flex-wrap">
-                  <span class="badge badge--women">📅 Day ${daysSinceLast} of cycle</span>
-                  ${daysToNext > 0 ? `<span class="badge badge--muted">Next period ~${daysToNext} day${daysToNext !== 1 ? 's' : ''}</span>` : '<span class="badge badge--danger">Period expected soon</span>'}
-                  <span class="badge badge--muted">Cycle length: ${cycleLength} days</span>
-                </div>
-              </div>
-              <a href="menstrual.html" class="btn btn--sm" style="border:1.5px solid ${phaseColor};color:${phaseColor};background:transparent;flex-shrink:0">🌸 Full Details</a>
-            </div>
-            <div class="text-xs text-muted mt-4" style="border-top:1px solid var(--color-border);padding-top:var(--space-3)">
-              ⚕️ Cycle phase is estimated based on your last period date. This is not medical advice.
-            </div>
-          </div>
-        `;
-      }
-    });
-  </script>
-
+  document.addEventListener('DOMContentLoaded', renderWeekSummary);
+  window.renderWeekSummary = renderWeekSummary;
+</script>
   
   <div id="no-profile-modal" role="dialog" aria-modal="true" aria-labelledby="np-modal-title">
     <div class="no-profile-backdrop"></div>
