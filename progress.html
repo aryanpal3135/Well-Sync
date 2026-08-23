@@ -16,7 +16,6 @@
     .stats-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6); }
     @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
 
-    /* ── No-Profile Modal ──────────────────────────────── */
     #no-profile-modal {
       display: none;
       position: fixed; inset: 0; z-index: 9999;
@@ -159,13 +158,11 @@
   <script src="js/recommendationEngine.js"></script>
   <script src="js/progress.js"></script>
   <script>
-    // Dynamic unit label
     document.getElementById('log-type').addEventListener('change', function() {
       const units = { water: 'ml', sleep: 'hours', exercise: 'minutes', meal: 'meals', yoga: 'minutes' };
       document.getElementById('log-unit').textContent = units[this.value] || 'unit';
     });
 
-    // Weekly summary + cycle section
     document.addEventListener('DOMContentLoaded', () => {
       const user    = Auth.getCurrentUser();
       const profile = Storage.getActiveProfile(user?.id);
@@ -201,7 +198,6 @@
         </div>
       `;
 
-      // ── Menstrual Cycle Section (Women only) ────────────────────
       const cycleSection = document.getElementById('cycle-progress-section');
       if (cycleSection && profile.gender === 'women' && profile.cycleData?.lastPeriodDate) {
         const { lastPeriodDate, cycleLength = 28 } = profile.cycleData;
