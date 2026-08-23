@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Profile – WellSync</title>
+  <meta name="description" content="Create or update your personalized health profile on WellSync." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <style>
+    .type-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      margin-top: var(--space-6);
+    }
+    .type-card {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8) var(--space-6);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--duration-base) var(--ease-out);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .type-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .type-card--men:hover, .type-card--men.selected {
+      border-color: var(--color-secondary);
+      background: var(--color-secondary-light);
+      box-shadow: 0 0 0 3px hsla(196, 62%, 46%, 0.15), var(--shadow-lg);
+    }
+    .type-card--women:hover, .type-card--women.selected {
+      border-color: var(--color-accent-women);
+      background: var(--color-accent-women-light);
+      box-shadow: 0 0 0 3px hsla(300, 35%, 55%, 0.15), var(--shadow-lg);
+    }
+    .type-card--child:hover, .type-card--child.selected {
+      border-color: var(--color-accent-child);
+      background: var(--color-accent-child-light);
+      box-shadow: 0 0 0 3px hsla(38, 88%, 52%, 0.15), var(--shadow-lg);
+    }
+    .type-card__emoji { font-size: 3.5rem; line-height: 1; }
+    .type-card__title { font-family: var(--font-heading); font-size: var(--text-xl); font-weight: var(--weight-bold); }
+    .type-card__desc { font-size: var(--text-sm); color: var(--color-text-muted); line-height: var(--leading-relaxed); }
+    .type-card.selected .type-card__title::after { content: ' ✓'; color: var(--color-primary); }
+
+    .form-section-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-base);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text);
+      padding: var(--space-4) 0 var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-4);
+      letter-spacing: var(--tracking-wide);
+    }
+
+    .goal-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+    .goal-option-label { cursor: pointer; }
+    .goal-radio { display: none; }
+    .goal-checkbox { display: none; }
+    .goal-option-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-medium);
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out);
+      cursor: pointer;
+    }
+    .goal-option-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+    }
+    .goal-option-btn.selected {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      font-weight: var(--weight-semibold);
+      box-shadow: 0 0 0 2px hsla(152, 58%, 40%, 0.2);
+    }
+
+    .symptom-checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+    .symptom-check {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      font-size: var(--text-sm);
+      transition: all var(--duration-fast);
+      background: var(--color-surface);
+    }
+    .symptom-check:has(input:checked) {
+      border-color: var(--color-accent-women);
+      background: var(--color-accent-women-light);
+      color: var(--color-accent-women);
+    }
+    .symptom-check input { width: 14px; height: 14px; accent-color: var(--color-accent-women); }
+
+    @media (max-width: 768px) {
+      .type-selector-grid { grid-template-columns: 1fr; }
+      .type-card { flex-direction: row; text-align: left; padding: var(--space-5); }
+      .type-card__emoji { font-size: 2.5rem; }
+    }
+    @media (max-width: 480px) {
+      .goal-options { flex-direction: column; }
+      .goal-option-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  
+  <nav class="navbar">
+    <div class="container navbar__inner">
+      <a href="dashboard.html" class="navbar__logo">
+        <div class="navbar__logo-icon">🌿</div>
+        WellSync
+      </a>
+      <div class="navbar__nav" id="nav-links">
+        <a href="dashboard.html" class="navbar__link">📊 Dashboard</a>
+        <a href="profile.html" class="navbar__link active">👤 Profile</a>
+        <a href="recommendations.html" class="navbar__link">💡 Recommendations</a>
+        <a href="progress.html" class="navbar__link">📈 Progress</a>
+        <a href="menstrual.html" class="navbar__link" id="cycle-nav-link" style="display:none">🌸 Cycle</a>
+      </div>
+      <div class="navbar__actions">
+        <button class="btn btn--ghost btn--sm" data-action="logout">↩ Logout</button>
+        <button class="navbar__burger" id="nav-burger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  
+  <div class="navbar__mobile-drawer" id="mobile-drawer">
+    <a href="dashboard.html" class="navbar__link">📊 Dashboard</a>
+    <a href="profile.html" class="navbar__link active">👤 Profile</a>
+    <a href="recommendations.html" class="navbar__link">💡 Recommendations</a>
+    <a href="progress.html" class="navbar__link">📈 Progress</a>
+    <a href="menstrual.html" class="navbar__link" id="cycle-nav-link-mobile" style="display:none">🌸 Cycle</a>
+    <button class="btn btn--ghost btn--sm" data-action="logout">↩ Logout</button>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+
+      
+      <div class="mb-8">
+        <h1 style="font-family:var(--font-heading);font-size:var(--text-2xl);font-weight:var(--weight-bold);">
+          👤 Create Wellness Profile
+        </h1>
+        <p style="color:var(--color-text-secondary);margin-top:var(--space-2);">
+          Hi <strong id="profile-welcome-name">there</strong>! Tell us about yourself so we can personalize your wellness plan.
+        </p>
+      </div>
+
+      
+      <div class="card mb-8">
+        <div class="card__header">
+          <div>
+            <h2 class="card__title">Who are you creating a plan for?</h2>
+            <p class="card__subtitle">Choose a profile type — each has uniquely tailored recommendations.</p>
+          </div>
+        </div>
+        <div class="type-selector-grid stagger">
+          <div class="type-card type-card--men animate-scaleIn" data-type="men" role="button" tabindex="0">
+            <span class="type-card__emoji">👨</span>
+            <h3 class="type-card__title">Men</h3>
+            <p class="type-card__desc">Strength, fitness, weight management, and general wellness plans for men.</p>
+          </div>
+          <div class="type-card type-card--women animate-scaleIn" data-type="women" role="button" tabindex="0">
+            <span class="type-card__emoji">👩</span>
+            <h3 class="type-card__title">Women</h3>
+            <p class="type-card__desc">Balanced wellness including optional menstrual cycle tracking for women.</p>
+          </div>
+          <div class="type-card type-card--child animate-scaleIn" data-type="child" role="button" tabindex="0">
+            <span class="type-card__emoji">👶</span>
+            <h3 class="type-card__title">Children</h3>
+            <p class="type-card__desc">Healthy development-focused recommendations for children ages 3–17.</p>
+          </div>
+        </div>
+      </div>
+
+      
+      <div id="profile-form-section"></div>
+
+      
+      <div id="existing-profiles"></div>
+
+      
+      <div class="alert alert--info mt-8">
+        <span class="alert__icon">⚕️</span>
+        <div class="alert__body">
+          <div class="alert__title">Wellness Disclaimer</div>
+          WellSync provides general wellness and educational recommendations. This is not a substitute for professional medical advice. Consult qualified healthcare professionals for medical decisions.
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__disclaimer">
+        ⚕️ WellSync provides general wellness information only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional.
+      </p>
+    </div>
+  </footer>
+
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>
