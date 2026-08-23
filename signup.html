@@ -154,15 +154,12 @@
     Auth.redirectIfLoggedIn();
     ThemeManager.init();
 
-    // Mobile logo visibility
     const mobileLogoEl = document.getElementById('mobile-logo');
     if (window.innerWidth <= 768) mobileLogoEl.style.display = 'flex';
 
-    // Theme toggle (mobile)
     const mobileThemeBtn = document.getElementById('theme-toggle-mobile');
     if (mobileThemeBtn) mobileThemeBtn.addEventListener('click', () => ThemeManager.toggle());
 
-    // Form submission
     const form = document.getElementById('signup-form');
     const btn  = document.getElementById('signup-btn');
 
@@ -172,7 +169,6 @@
 
       const data = FormHelpers.serialize(form);
 
-      // Validate terms
       if (!document.getElementById('terms').checked) {
         Toast.show('Please accept the wellness disclaimer to continue.', 'warning');
         return;
@@ -181,7 +177,6 @@
       btn.classList.add('btn--loading');
       btn.disabled = true;
 
-      // Small delay to simulate processing (Phase 2: real API call)
       setTimeout(() => {
         const result = Auth.register(data);
         btn.classList.remove('btn--loading');
@@ -196,7 +191,6 @@
         } else {
           Toast.show(result.message, 'error');
 
-          // Highlight specific fields
           if (result.message.includes('email')) {
             FormHelpers.setError(document.getElementById('email'), result.message);
           } else if (result.message.includes('Password') || result.message.includes('password')) {
@@ -208,7 +202,6 @@
       }, 600);
     });
 
-    // Real-time email validation
     document.getElementById('email').addEventListener('blur', function() {
       if (this.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value)) {
         FormHelpers.setError(this, 'Please enter a valid email address.');
