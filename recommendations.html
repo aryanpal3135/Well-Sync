@@ -88,7 +88,6 @@
       line-height: var(--leading-relaxed);
     }
 
-    /* ── No-Profile Modal ──────────────────────────────── */
     #no-profile-modal {
       display: none;
       position: fixed; inset: 0; z-index: 9999;
@@ -277,7 +276,6 @@
     await generateAndRender();
     initTabs();
 
-    // Handle hash navigation from other pages
     const hash = window.location.hash.replace('#', '');
     if (hash) {
       const btn = document.querySelector(`[data-tab="${hash}"]`);
