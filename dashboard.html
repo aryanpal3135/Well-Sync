@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – WellSync</title>
+  <meta name="description" content="Your personalized WellSync wellness dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <style>
+    /* ── No-Profile Modal ──────────────────────────────── */
+    #no-profile-modal {
+      display: none;
+      position: fixed; inset: 0; z-index: 9999;
+      align-items: center; justify-content: center;
+    }
+    #no-profile-modal.show { display: flex; }
+    .no-profile-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(10,15,30,0.6);
+      backdrop-filter: blur(6px);
+      animation: npFadeIn 0.25s ease;
+    }
+    .no-profile-dialog {
+      position: relative; z-index: 1;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      padding: var(--space-10) var(--space-8);
+      width: 100%; max-width: 440px;
+      margin: var(--space-4);
+      text-align: center;
+      animation: npSlideUp 0.28s cubic-bezier(.34,1.4,.64,1);
+    }
+    .no-profile-icon { font-size: 3.5rem; margin-bottom: var(--space-4); }
+    .no-profile-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--weight-bold);
+      margin-bottom: var(--space-3);
+    }
+    .no-profile-msg {
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin-bottom: var(--space-6);
+    }
+    @keyframes npFadeIn  { from { opacity:0 } to { opacity:1 } }
+    @keyframes npSlideUp { from { opacity:0; transform:translateY(28px) scale(.96) } to { opacity:1; transform:none } }
+  </style>
+</head>
+<body>
+
+  
+  <nav class="navbar">
+    <div class="container navbar__inner">
+      <a href="dashboard.html" class="navbar__logo">
+        <div class="navbar__logo-icon">🌿</div>
+        WellSync
+      </a>
+      <div class="navbar__nav">
+        <a href="dashboard.html" class="navbar__link active">📊 Dashboard</a>
+        <a href="profile.html" class="navbar__link">👤 Profile</a>
+        <a href="recommendations.html" class="navbar__link">💡 Recommendations</a>
+        <a href="progress.html" class="navbar__link">📈 Progress</a>
+        <a href="menstrual.html" class="navbar__link" id="cycle-nav-link" style="display:none">🌸 Cycle</a>
+      </div>
+      <div class="navbar__actions">
+        <button class="btn btn--ghost btn--sm" data-action="logout">↩ Logout</button>
+        <button class="navbar__burger" id="nav-burger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  
+  <div class="navbar__mobile-drawer" id="mobile-drawer">
+    <a href="dashboard.html" class="navbar__link active">📊 Dashboard</a>
+    <a href="profile.html" class="navbar__link">👤 Profile</a>
+    <a href="recommendations.html" class="navbar__link">💡 Recommendations</a>
+    <a href="progress.html" class="navbar__link">📈 Progress</a>
+    <a href="menstrual.html" class="navbar__link" id="cycle-nav-link-mobile" style="display:none">🌸 Cycle</a>
+    <button class="btn btn--ghost btn--sm" data-action="logout">↩ Logout</button>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+
+      
+      <div class="dashboard-header mb-6">
+        <div>
+          <div class="dashboard-header__greeting" id="greeting-text">Good Morning 👋</div>
+          <div class="dashboard-header__sub">Here's your personalized wellness summary for today.</div>
+          <div class="mt-2" id="profile-badge"></div>
+        </div>
+        <div class="dashboard-header__actions">
+          <a href="recommendations.html" class="btn btn--primary btn--sm">💡 View Full Plan</a>
+          <a href="profile.html" class="btn btn--secondary btn--sm">👤 Edit Profile</a>
+        </div>
+      </div>
+
+      
+      <div class="dashboard-grid">
+
+        
+        <div class="dashboard-main">
+
+          
+          <div>
+            <div class="section-title">📊 Today's Metrics</div>
+            <div class="stat-cards-grid stagger" id="stat-cards">
+              
+              <div class="stat-card"><div class="spinner"></div></div>
+              <div class="stat-card"><div class="spinner"></div></div>
+              <div class="stat-card"><div class="spinner"></div></div>
+              <div class="stat-card"><div class="spinner"></div></div>
+            </div>
+          </div>
+
+          
+          <div>
+            <div class="section-title">
+              📅 Today's Plan
+              <a href="recommendations.html">View All →</a>
+            </div>
+            <div class="plan-grid stagger">
+              <div class="plan-card animate-fadeIn">
+                <div class="plan-card__icon">🍎</div>
+                <div class="plan-card__title">Diet</div>
+                <div id="today-diet"><div class="spinner"></div></div>
+              </div>
+              <div class="plan-card animate-fadeIn">
+                <div class="plan-card__icon">🏋️</div>
+                <div class="plan-card__title">Exercise</div>
+                <div id="today-exercise"><div class="spinner"></div></div>
+              </div>
+              <div class="plan-card animate-fadeIn">
+                <div class="plan-card__icon">🧘</div>
+                <div class="plan-card__title">Yoga</div>
+                <div id="today-yoga"><div class="spinner"></div></div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="dashboard-section" id="cycle-section">
+            <div class="section-title">🌸 Cycle Wellness</div>
+            <div class="card" id="cycle-card">
+              <div class="spinner"></div>
+            </div>
+          </div>
+
+          
+          <div id="lifestyle-tips"></div>
+
+        </div>
+
+        
+        <div class="dashboard-aside">
+
+          
+          <div class="score-card">
+            <div class="score-card__header">
+              <span class="score-card__title">🌟 Wellness Score</span>
+              <span class="badge badge--muted" title="Educational score, not a medical measurement">ℹ️</span>
+            </div>
+            <div class="score-ring-wrapper">
+              <div class="score-ring" style="width:140px;height:140px">
+                <svg width="140" height="140" viewBox="0 0 140 140">
+                  <circle class="score-ring__bg" cx="70" cy="70" r="55" stroke-width="10" />
+                  <circle class="score-ring__fill" cx="70" cy="70" r="55" stroke-width="10"
+                    stroke-dasharray="345.4" stroke-dashoffset="345.4" />
+                </svg>
+                <div class="score-ring__text">
+                  <span class="score-ring__number" id="score-number">—</span>
+                  <span class="score-ring__label">/ 100</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-weight:700;font-size:var(--text-lg);text-align:center" id="score-grade">Loading…</div>
+                <div class="text-xs text-muted text-center mt-1">Educational score only — not medical</div>
+              </div>
+            </div>
+            
+            <div id="score-breakdown"></div>
+            <a href="progress.html" class="btn btn--outline-primary btn--full btn--sm mt-4">📈 View Progress Charts</a>
+          </div>
+
+        </div>
+      </div>
+
+      
+      <div class="alert alert--info mt-8">
+        <span class="alert__icon">⚕️</span>
+        <div class="alert__body">
+          <div class="alert__title">Wellness Disclaimer</div>
+          WellSync provides personalized wellness and educational recommendations. It is not a substitute for professional medical advice. The Wellness Score is a motivational tracking tool, not a medical measurement.
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__disclaimer">
+        ⚕️ WellSync provides general wellness information only. Not a substitute for professional medical advice, diagnosis, or treatment.
+      </p>
+    </div>
+  </footer>
+
+  <div id="toast-container"></div>
+
+  
+  <div id="no-profile-modal" role="dialog" aria-modal="true" aria-labelledby="np-modal-title">
+    <div class="no-profile-backdrop"></div>
+    <div class="no-profile-dialog">
+      <div class="no-profile-icon">👤</div>
+      <h2 class="no-profile-title" id="np-modal-title">No Profile Found</h2>
+      <p class="no-profile-msg">
+        You haven't created a wellness profile yet.<br/>
+        Create one to unlock your personalized dashboard, recommendations, and progress tracking.
+      </p>
+      <a href="profile.html" class="btn btn--primary" style="width:100%;justify-content:center;font-size:var(--text-base);padding:var(--space-4);">
+        👤 Create My Profile
+      </a>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/recommendationEngine.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script>
+    // Show cycle nav link for women
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.getCurrentUser();
+      if (user) {
+        const profile = Storage.getActiveProfile(user.id);
+        if (profile?.gender === 'women') {
+          document.getElementById('cycle-nav-link')?.style.setProperty('display', 'flex');
+          document.getElementById('cycle-nav-link-mobile')?.style.setProperty('display', 'flex');
+          document.getElementById('cycle-quick-link')?.style.setProperty('display', 'block');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
