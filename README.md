@@ -3,7 +3,7 @@
 > **Academic Project Submission**  
 > **Course:** Back End Engineering (24CAI0303)  
 > **Department:** Computer Science & Engineering (AI & ML) — 5th Semester  
-> **Institution:** Chitkara University  
+> **Institution:** Chitkara University 
 > **Evaluation Phase:** Continuous Assessment 2 (Full-Stack MERN Architecture)
 
 ---
