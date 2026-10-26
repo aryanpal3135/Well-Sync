@@ -1,0 +1,92 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "WellSync API Collection",
+  "collectionId": "wellsync-thunder-collection",
+  "dateExported": "2026-10-25",
+  "version": "1.1",
+  "folders": [
+    {
+      "containerId": "",
+      "sortNum": 10000,
+      "name": "01. Health Check",
+      "_id": "folder_health"
+    },
+    {
+      "containerId": "",
+      "sortNum": 20000,
+      "name": "02. Authentication",
+      "_id": "folder_auth"
+    },
+    {
+      "containerId": "",
+      "sortNum": 30000,
+      "name": "03. Family Profiles",
+      "_id": "folder_profiles"
+    },
+    {
+      "containerId": "",
+      "sortNum": 40000,
+      "name": "04. Health Logs",
+      "_id": "folder_logs"
+    },
+    {
+      "containerId": "",
+      "sortNum": 50000,
+      "name": "05. Menstrual Cycle",
+      "_id": "folder_cycle"
+    },
+    {
+      "containerId": "",
+      "sortNum": 60000,
+      "name": "06. Wellness Recommendations",
+      "_id": "folder_recommendations"
+    }
+  ],
+  "requests": [
+    {
+      "containerId": "folder_health",
+      "sortNum": 10000,
+      "name": "Health Check",
+      "method": "GET",
+      "url": "http://localhost:5000/api/health"
+    },
+    {
+      "containerId": "folder_auth",
+      "sortNum": 20000,
+      "name": "Register User",
+      "method": "POST",
+      "url": "http://localhost:5000/api/auth/register",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Ayush Singh Tomar\",\n  \"email\": \"ayush@chitkara.edu.in\",\n  \"password\": \"password123\"\n}"
+      }
+    },
+    {
+      "containerId": "folder_auth",
+      "sortNum": 21000,
+      "name": "Login User",
+      "method": "POST",
+      "url": "http://localhost:5000/api/auth/login",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"ayush@wellsync.com\",\n  \"password\": \"Password@123\"\n}"
+      }
+    },
+    {
+      "containerId": "folder_profiles",
+      "sortNum": 30000,
+      "name": "Get Profiles",
+      "method": "GET",
+      "url": "http://localhost:5000/api/profiles"
+    },
+    {
+      "containerId": "folder_recommendations",
+      "sortNum": 60000,
+      "name": "Get Foods",
+      "method": "GET",
+      "url": "http://localhost:5000/api/recommendations/foods"
+    }
+  ]
+}

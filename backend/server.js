@@ -48,6 +48,9 @@ app.get('/api/health', (req, res) => {
 // Mount REST API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/profiles', require('./routes/profileRoutes'));
+app.use('/api/logs', require('./routes/logRoutes'));
+app.use('/api/cycle', require('./routes/cycleRoutes'));
+app.use('/api/recommendations', require('./routes/recommendationRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 
 // Serve Frontend statically so entire fullstack app can run from single server or deployed URL

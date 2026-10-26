@@ -1,0 +1,585 @@
+{
+  "info": {
+    "_postman_id": "wellsync-backend-collection-v1",
+    "name": "WellSync API Collection",
+    "description": "Comprehensive REST API test collection for WellSync (Chitkara University - CSE AIML 5th Sem Backend Engineering)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "profileId",
+      "value": "",
+      "type": "string",
+      "description": "Active profile ID — set automatically by 'Get All Profiles' or 'Switch to Profile' requests"
+    },
+    {
+      "key": "profile1Id",
+      "value": "",
+      "type": "string",
+      "description": "First profile ID (auto-saved by Get All Profiles)"
+    },
+    {
+      "key": "profile2Id",
+      "value": "",
+      "type": "string",
+      "description": "Second profile ID (auto-saved by Get All Profiles)"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "    console.log('✅ Registered & token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ayush Singh Tomar\",\n  \"email\": \"ayush@chitkara.edu.in\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "    console.log('✅ Token saved. Next step: run \"Get All Profiles\" to load your profiles.');",
+                  "} else {",
+                  "    console.error('❌ Login failed:', jsonData.message);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ayush@wellsync.com\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Family Profiles",
+      "item": [
+        {
+          "name": "Create Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data._id) {",
+                  "    pm.collectionVariables.set('profileId', jsonData.data._id);",
+                  "    pm.environment.set('profileId', jsonData.data._id);",
+                  "    console.log('✅ New profile created. profileId set to:', jsonData.data._id);",
+                  "    console.log('   Name:', jsonData.data.name, '| Gender:', jsonData.data.gender);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ayush\",\n  \"relation\": \"self\",\n  \"age\": 21,\n  \"gender\": \"men\",\n  \"height\": 175,\n  \"weight\": 68,\n  \"activityLevel\": \"moderately_active\",\n  \"goal\": \"general_wellness\",\n  \"dietaryPreference\": \"vegetarian\",\n  \"isPrimary\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profiles"]
+            }
+          }
+        },
+        {
+          "name": "Get All Profiles  ← Run this first!",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "if (!jsonData.data || jsonData.data.length === 0) {",
+                  "    console.warn('⚠️  No profiles found. Create a profile first.');",
+                  "    return;",
+                  "}",
+                  "",
+                  "// ── Print a clear table of all profiles ──────────────────────────────",
+                  "console.log('');",
+                  "console.log('╔══════════════════════════════════════════════════════════════╗');",
+                  "console.log('║              YOUR PROFILES — COPY THE ID YOU NEED           ║');",
+                  "console.log('╠══════════════════════════════════════════════════════════════╣');",
+                  "jsonData.data.forEach(function(p, i) {",
+                  "    console.log('║  Profile ' + (i + 1) + ': ' + p.name + ' (' + p.gender + ', ' + p.age + ' yrs)' + (p.isPrimary ? '  ★ Primary' : ''));",
+                  "    console.log('║  ID: ' + p._id);",
+                  "    console.log('║  Goal: ' + p.goal + ' | Activity: ' + p.activityLevel);",
+                  "    console.log('╠══════════════════════════════════════════════════════════════╣');",
+                  "});",
+                  "console.log('╚══════════════════════════════════════════════════════════════╝');",
+                  "console.log('');",
+                  "",
+                  "// ── Save profile1Id and profile2Id variables ─────────────────────────",
+                  "if (jsonData.data[0]) {",
+                  "    pm.collectionVariables.set('profile1Id', jsonData.data[0]._id);",
+                  "    pm.environment.set('profile1Id', jsonData.data[0]._id);",
+                  "}",
+                  "if (jsonData.data[1]) {",
+                  "    pm.collectionVariables.set('profile2Id', jsonData.data[1]._id);",
+                  "    pm.environment.set('profile2Id', jsonData.data[1]._id);",
+                  "}",
+                  "",
+                  "// ── Auto-set active profileId to primary profile ──────────────────────",
+                  "var primary = jsonData.data.find(function(p) { return p.isPrimary; }) || jsonData.data[0];",
+                  "pm.collectionVariables.set('profileId', primary._id);",
+                  "pm.environment.set('profileId', primary._id);",
+                  "console.log('✅ Active profileId set to PRIMARY profile: ' + primary.name + ' (' + primary._id + ')');",
+                  "console.log('   To switch profiles, use the \"Switch to Profile 1\" or \"Switch to Profile 2\" requests below.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profiles"]
+            }
+          }
+        },
+        {
+          "name": "🔵 Switch to Profile 1",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Sets profileId to Profile 1 — all subsequent requests will use this profile",
+                  "var p1 = pm.collectionVariables.get('profile1Id');",
+                  "if (p1) {",
+                  "    pm.collectionVariables.set('profileId', p1);",
+                  "    pm.environment.set('profileId', p1);",
+                  "    console.log('🔵 Switched to Profile 1. profileId =', p1);",
+                  "} else {",
+                  "    console.warn('⚠️  profile1Id not set. Run \"Get All Profiles\" first.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data) {",
+                  "    console.log('🔵 Now viewing Profile 1:', jsonData.data.name, '(' + jsonData.data.gender + ', age ' + jsonData.data.age + ')');",
+                  "    console.log('   ID:', jsonData.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles/{{profile1Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profiles", "{{profile1Id}}"]
+            }
+          }
+        },
+        {
+          "name": "🟢 Switch to Profile 2",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Sets profileId to Profile 2 — all subsequent requests will use this profile",
+                  "var p2 = pm.collectionVariables.get('profile2Id');",
+                  "if (p2) {",
+                  "    pm.collectionVariables.set('profileId', p2);",
+                  "    pm.environment.set('profileId', p2);",
+                  "    console.log('🟢 Switched to Profile 2. profileId =', p2);",
+                  "} else {",
+                  "    console.warn('⚠️  profile2Id not set. You may only have 1 profile. Run \"Get All Profiles\" first.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data) {",
+                  "    console.log('🟢 Now viewing Profile 2:', jsonData.data.name, '(' + jsonData.data.gender + ', age ' + jsonData.data.age + ')');",
+                  "    console.log('   ID:', jsonData.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles/{{profile2Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profiles", "{{profile2Id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile By ID (active)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles/{{profileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profiles", "{{profileId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile (active)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 70,\n  \"goal\": \"general_wellness\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles/{{profileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profiles", "{{profileId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Profile (active)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles/{{profileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profiles", "{{profileId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Health Logs",
+      "item": [
+        {
+          "name": "Log Daily Health Metrics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data) {",
+                  "    console.log('✅ Health log saved successfully!');",
+                  "    console.log('   Profile ID:   ', jsonData.data.profileId);",
+                  "    console.log('   Date:         ', jsonData.data.date);",
+                  "    console.log('   Water Intake: ', jsonData.data.waterIntake, 'ml');",
+                  "    console.log('   Sleep Hours:  ', jsonData.data.sleepHours, 'hrs');",
+                  "} else {",
+                  "    console.error('❌ Failed to log metrics:', jsonData.message);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profileId\": \"{{profileId}}\",\n  \"waterIntake\": 2000,\n  \"sleepHours\": 7.5,\n  \"workoutMinutes\": 45,\n  \"caloriesBurned\": 420,\n  \"mood\": \"great\",\n  \"notes\": \"Drank 2000 ml water and did 45 mins cardio.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs"]
+            }
+          }
+        },
+        {
+          "name": "Get Health Logs (active profile)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    console.log('📋 Found ' + jsonData.data.length + ' health log(s) for active profile:');",
+                  "    jsonData.data.forEach(function(l, i) {",
+                  "        console.log('   [' + (i + 1) + '] Date: ' + l.date + ' | Water: ' + l.waterIntake + ' ml | Sleep: ' + l.sleepHours + ' hrs | Workout: ' + l.workoutMinutes + ' mins');",
+                  "    });",
+                  "} else {",
+                  "    console.warn('⚠️  No health logs found for active profile (profileId = ' + pm.collectionVariables.get('profileId') + ').');",
+                  "    console.log('   Tip: Send \"Log Daily Health Metrics\" first, or switch to another profile.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs?profileId={{profileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs"],
+              "query": [{ "key": "profileId", "value": "{{profileId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Get Health Logs (all profiles)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs"]
+            }
+          }
+        },
+        {
+          "name": "Get Health Log Stats (7 days)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs/stats?profileId={{profileId}}&days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs", "stats"],
+              "query": [
+                { "key": "profileId", "value": "{{profileId}}" },
+                { "key": "days", "value": "7" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Menstrual Cycle",
+      "item": [
+        {
+          "name": "Create Cycle Log",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profileId\": \"{{profileId}}\",\n  \"startDate\": \"2026-10-01\",\n  \"cycleLength\": 28,\n  \"periodLength\": 5,\n  \"flow\": \"medium\",\n  \"symptoms\": [\"cramps\", \"fatigue\"],\n  \"notes\": \"Regular cycle tracking\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cycle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cycle"]
+            }
+          }
+        },
+        {
+          "name": "Get Cycle Logs (active profile)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/cycle?profileId={{profileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cycle"],
+              "query": [{ "key": "profileId", "value": "{{profileId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Get Cycle Logs (all profiles)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/cycle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cycle"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Wellness Recommendations",
+      "item": [
+        {
+          "name": "Get Healthy Foods",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/recommendations/foods",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recommendations", "foods"]
+            }
+          }
+        },
+        {
+          "name": "Get Exercises",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/recommendations/exercises",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recommendations", "exercises"]
+            }
+          }
+        },
+        {
+          "name": "Get Yoga Routines",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/recommendations/yoga",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recommendations", "yoga"]
+            }
+          }
+        },
+        {
+          "name": "Generate Algorithmic Wellness Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 21,\n  \"gender\": \"men\",\n  \"height\": 175,\n  \"weight\": 68,\n  \"activityLevel\": \"moderately_active\",\n  \"goal\": \"general_wellness\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/recommendations/plan",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recommendations", "plan"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
