@@ -13,7 +13,7 @@ const API_CONFIG = {
 
   // Option B: Your deployed backend URL on Render / Railway
   // Example: 'https://wellsync-backend.onrender.com/api'
-  DEPLOYED_URL: '',
+  DEPLOYED_URL: 'https://well-sync-ra8x.onrender.com/api',
 
   // Automatically selects appropriate URL:
   // - If DEPLOYED_URL is specified, it prioritizes it
