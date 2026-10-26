@@ -190,12 +190,7 @@ npm test
 
 ---
 
-## 📚 Evaluation & Viva Resources
 
-- **Deployment Guide:** [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)
-- **Viva Preparation & Code Defense:** [docs/VIVA_PREPARATION.md](docs/VIVA_PREPARATION.md)
-
----
 
 ## ⚠️ Disclaimer
 
