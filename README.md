@@ -1,108 +1,202 @@
-# Well-Sync
-WellSync is a family-focused healthcare and wellness recommendation system designed to help users manage their family's health and make better lifestyle decisions. The platform provides personalized wellness recommendations based on user information, health needs, and lifestyle preferences.
-
 # 🌿 WellSync – Family Healthcare & Wellness Recommendation System
 
-**WellSync** is a family healthcare and wellness recommendation system designed to help users maintain a healthier lifestyle through personalized recommendations, health tracking, and wellness guidance.
+> **Academic Project Submission**  
+> **Course:** Back End Engineering (24CAI0303)  
+> **Department:** Computer Science & Engineering (AI & ML) — 5th Semester  
+> **Institution:** Chitkara University  
+> **Evaluation Phase:** Continuous Assessment 2 (Full-Stack MERN Architecture)
 
-The platform provides features such as personalized recommendations, exercise and food suggestions, yoga guidance, progress tracking, profile management, and family wellness management through a simple and user-friendly interface.
+---
+
+## 📖 Overview
+
+**WellSync** is a full-stack, family-focused healthcare and wellness recommendation system designed to empower users to manage their family's health and lifestyle decisions. 
+
+Following the completion of the Frontend in Assessment 1, **Assessment 2** introduces a complete, production-ready backend built with **Node.js**, **Express.js**, and **MongoDB Atlas**, structured strictly using the **MVC (Model-View-Controller)** architecture.
+
+---
 
 ## ✨ Features
 
-* 🔐 **User Authentication** – Sign up and login functionality
-* 👨‍👩‍👧‍👦 **Family Health Management** – Manage health-related information for family members
-* 💡 **Personalized Recommendations** – Get recommendations based on user information and wellness needs
-* 🥗 **Food Recommendations** – Healthy food and nutrition suggestions
-* 🏋️ **Exercise Recommendations** – Recommended exercises for maintaining fitness
-* 🧘 **Yoga Recommendations** – Yoga practices for health and wellness
-* 📊 **Progress Tracking** – Track wellness and fitness progress
-* 👤 **Profile Management** – Manage personal and health information
-* 🌸 **Menstrual Health Tracking** – Track menstrual cycle information
-* 📱 **Responsive Design** – Works across different screen sizes
+- 🔐 **JWT Authentication & Security** — User signup/login with `bcryptjs` password hashing and protected API routes.
+- 👨‍👩‍👧‍👦 **Family Profile Management** — Dynamic CRUD management for self and family members with automatic BMI calculation.
+- 📊 **Daily Health Logging & Stats** — Track water intake, sleep hours, workout minutes, calories burned, and mood.
+- 🌸 **Menstrual Health Tracking** — Log cycle dates, duration, symptoms, and get phase-specific wellness guidance.
+- 🥗 **Personalized Wellness Recommendations** — Algorithmic diet, exercise, and yoga recommendations tailored to user age, gender, BMI, and goals.
+- 📁 **Multer File Uploads** — Profile avatar and image upload endpoint with MIME type validation.
+- 🧪 **API Testing Collections** — Complete **Postman** and **Thunder Client** collections with automated token capture.
+- 🚀 **Cloud Deployment Ready** — Ready for one-click deployment on **Render** / **Railway** with MongoDB Atlas.
 
-## 🛠️ Technologies Used
+---
 
-* **HTML5** – Website structure
-* **CSS3** – Styling and responsive design
-* **JavaScript** – Functionality and recommendation logic
-* **JSON** – Storing food, exercise, yoga, and recommendation data
-* **Local Storage** – Storing user and application data locally
-
-## 📂 Project Structure
+## 🏗️ Project Architecture & Directory Structure
 
 ```text
 WellSync/
+├── frontend/                          # Client-side web interface
+│   ├── index.html                     # Landing page
+│   ├── login.html                     # User authentication
+│   ├── signup.html                    # Account registration
+│   ├── dashboard.html                 # Personalized wellness dashboard
+│   ├── profile.html                   # Family profile manager
+│   ├── progress.html                  # Progress analytics & logs
+│   ├── recommendations.html           # Food, exercise & yoga suggestions
+│   ├── menstrual.html                 # Menstrual cycle tracker
+│   ├── css/                           # Stylesheets (style, auth, dashboard, responsive)
+│   ├── js/
+│   │   ├── apiConfig.js               # Toggle between localhost and deployed URL
+│   │   ├── api.js                     # REST API client with JWT interceptor
+│   │   ├── auth.js                    # Auth methods and session management
+│   │   ├── storage.js                 # API-first storage with MongoDB sync
+│   │   ├── dashboard.js               # Dashboard metrics and greeting
+│   │   ├── profile.js                 # Profile form handling
+│   │   ├── progress.js                # Health log charting
+│   │   ├── menstrual.js               # Cycle phase calculations
+│   │   └── recommendationEngine.js   # Rule-based wellness recommendations
+│   └── data/                          # Recommendation datasets (foods, exercises, yoga)
 │
-├── index.html
-├── login.html
-├── signup.html
-├── dashboard.html
-├── profile.html
-├── progress.html
-├── recommendations.html
-├── menstrual.html
+├── backend/                           # Node.js & Express.js REST API (MVC)
+│   ├── config/
+│   │   └── db.js                      # MongoDB Atlas Mongoose connection
+│   ├── models/                        # Mongoose Schemas (M in MVC)
+│   │   ├── User.js                    # User schema with bcrypt hooks
+│   │   ├── Profile.js                 # Family profile schema & BMI calculation
+│   │   ├── HealthLog.js               # Daily wellness logs
+│   │   ├── CycleLog.js                # Menstrual cycle logs
+│   │   └── Recommendation.js          # Wellness items schema
+│   ├── controllers/                   # Controller Logic (C in MVC)
+│   │   ├── authController.js          # Auth, registration, login, profile updates
+│   │   ├── profileController.js       # Profile CRUD & cascade deletion
+│   │   ├── logController.js           # Health logging & statistics
+│   │   ├── cycleController.js         # Menstrual cycle logging & updates
+│   │   ├── recommendationController.js# Algorithmic plan & item queries
+│   │   └── uploadController.js        # Multer image upload
+│   ├── routes/                        # Express API Routes
+│   │   ├── authRoutes.js              # /api/auth
+│   │   ├── profileRoutes.js           # /api/profiles
+│   │   ├── logRoutes.js               # /api/logs
+│   │   ├── cycleRoutes.js             # /api/cycle
+│   │   ├── recommendationRoutes.js    # /api/recommendations
+│   │   └── uploadRoutes.js            # /api/upload
+│   ├── middleware/                    # Express Middlewares
+│   │   ├── authMiddleware.js          # JWT protection
+│   │   ├── errorMiddleware.js         # Centralized error handling
+│   │   └── uploadMiddleware.js        # Multer disk storage
+│   ├── uploads/                       # Uploaded avatars destination
+│   ├── server.js                      # Express server entry point
+│   ├── seed.js                        # Database population script
+│   ├── test-api.js                    # Automated CLI test suite
+│   ├── package.json                   # Dependencies
+│   └── .env.example                   # Environment variable template
 │
-├── css/
-│   ├── style.css
-│   ├── auth.css
-│   ├── dashboard.css
-│   └── responsive.css
+├── postman/                           # API testing collections
+│   └── WellSync.postman_collection.json
 │
-├── js/
-│   ├── auth.js
-│   ├── dashboard.js
-│   ├── profile.js
-│   ├── progress.js
-│   ├── menstrual.js
-│   ├── recommendationEngine.js
-│   └── storage.js
+├── thunder-client/                    # Thunder Client for VS Code
+│   └── thunder-collection_WellSync.json
 │
-└── data/
-    ├── exercises.json
-    ├── foods.json
-    ├── recommendations.json
-    └── yoga.json
+├── docs/                              # Project documentation
+│   ├── DEPLOYMENT_GUIDE.md            # Step-by-step Render + Atlas deployment
+│   └── VIVA_PREPARATION.md            # 5th sem syllabus Viva Q&A cheat sheet
+│
+└── README.md
 ```
 
-## 🚀 How to Run
+---
 
-1. Clone the repository:
+## 🛠️ Tech Stack
 
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+), Fetch API
+- **Backend Runtime:** Node.js (v18+)
+- **Backend Framework:** Express.js (v4.19+)
+- **Database:** MongoDB Atlas (Cloud NoSQL)
+- **Object Data Modeling:** Mongoose (v8.3+)
+- **Authentication:** JSON Web Tokens (`jsonwebtoken`), `bcryptjs`
+- **File Upload:** `multer`
+- **API Testing:** Postman, Thunder Client
+
+---
+
+## 🚀 How to Run Locally
+
+### 1. Install Backend Dependencies
+Open your terminal in the `backend` folder:
 ```bash
-git clone <your-repository-link>
+cd backend
+npm install
 ```
 
-2. Open the project folder.
+### 2. Configure Environment Variables
+Create or verify `backend/.env`:
+```env
+PORT=5000
+NODE_ENV=development
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/wellsync?retryWrites=true&w=majority
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRE=7d
+```
 
-3. Open `index.html` in your browser.
+### 3. Seed Database (Optional)
+Populate MongoDB Atlas with food, exercise, and yoga recommendations:
+```bash
+npm run seed
+```
 
-4. Create an account or log in to explore the WellSync dashboard and wellness features.
+### 4. Start Server
+```bash
+npm start
+# OR with auto-reload:
+npm run dev
+```
+The server will start at `http://localhost:5000` and also serve the frontend directly!
 
-> For the best development experience, you can use **Visual Studio Code with Live Server**.
+### 5. Run Automated API Tests
+```bash
+npm test
+```
 
-## 🎯 Project Objective
+---
 
-The main objective of WellSync is to provide a simple digital platform that helps families make better healthcare and lifestyle decisions.
+## 📡 REST API Reference
 
-Instead of searching for general health information, users can receive recommendations based on their individual needs and track their wellness activities in one place.
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/api/health` | Service health status check | No |
+| `POST` | `/api/auth/register` | Register new user account | No |
+| `POST` | `/api/auth/login` | Login user & receive JWT token | No |
+| `GET` | `/api/auth/me` | Get currently logged-in user profile | **Yes (Bearer)** |
+| `GET` | `/api/profiles` | Get all family profiles for user | **Yes (Bearer)** |
+| `POST` | `/api/profiles` | Create new family profile | **Yes (Bearer)** |
+| `GET` | `/api/profiles/:id` | Get specific profile by ID | **Yes (Bearer)** |
+| `PUT` | `/api/profiles/:id` | Update profile information | **Yes (Bearer)** |
+| `DELETE` | `/api/profiles/:id` | Delete profile and cascaded logs | **Yes (Bearer)** |
+| `GET` | `/api/logs` | Retrieve daily health logs | **Yes (Bearer)** |
+| `POST` | `/api/logs` | Log daily wellness metrics | **Yes (Bearer)** |
+| `GET` | `/api/logs/stats` | Get 7-day average health metrics | **Yes (Bearer)** |
+| `GET` | `/api/cycle` | Get menstrual cycle records | **Yes (Bearer)** |
+| `POST` | `/api/cycle` | Record new menstrual cycle period | **Yes (Bearer)** |
+| `GET` | `/api/recommendations/foods` | Fetch nutritional food recommendations | No |
+| `GET` | `/api/recommendations/exercises` | Fetch exercise routines | No |
+| `GET` | `/api/recommendations/yoga` | Fetch yoga practices | No |
+| `POST` | `/api/recommendations/plan` | Generate personalized algorithmic plan | **Yes (Bearer)** |
+| `POST` | `/api/upload` | Upload avatar/file using Multer | **Yes (Bearer)** |
 
-## 🔮 Future Improvements
+---
 
-* Integration with wearable fitness devices
-* Cloud-based database and user accounts
-* AI-powered health recommendations
-* Doctor/healthcare professional integration
-* Health reports and analytics
-* Mobile application
-* Notifications and wellness reminders
+## 🧪 Testing with Postman & Thunder Client
+
+1. **Postman**: Import `postman/WellSync.postman_collection.json`. When you run `Login User`, the response test script automatically captures the JWT token and applies it to subsequent protected requests.
+2. **Thunder Client**: Open VS Code → Thunder Client extension → Collections → Import `thunder-client/thunder-collection_WellSync.json`.
+
+---
+
+## 📚 Evaluation & Viva Resources
+
+- **Deployment Guide:** [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)
+- **Viva Preparation & Code Defense:** [docs/VIVA_PREPARATION.md](docs/VIVA_PREPARATION.md)
+
+---
 
 ## ⚠️ Disclaimer
 
-WellSync is an educational/project-based wellness application. The recommendations provided by the system are for general wellness purposes and should not be considered a substitute for professional medical advice, diagnosis, or treatment.
-
-## 👨‍💻 Project
-
-**Project Name:** WellSync
-**Category:** Family Healthcare & Wellness
-**Purpose:** Personalized Healthcare and Wellness Recommendations
-
+*WellSync is an educational, project-based wellness platform. Its recommendations are for general lifestyle and educational purposes and do not substitute for professional medical advice, diagnosis, or treatment.*

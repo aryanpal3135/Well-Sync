@@ -10,6 +10,13 @@ let wellnessScore  = null;
 document.addEventListener('DOMContentLoaded', async () => {
   Auth.requireAuth();
   currentUser   = Auth.getCurrentUser();
+  if (currentUser && typeof Storage.syncProfilesFromBackend === 'function') {
+    try {
+      await Storage.syncProfilesFromBackend(currentUser.id);
+    } catch (e) {
+      console.warn('[WellSync] Profile sync warning:', e);
+    }
+  }
   activeProfile = Storage.getActiveProfile(currentUser.id);
 
   if (!activeProfile) {
@@ -36,8 +43,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  const logs    = Storage.getLogs(currentUser.id);
+  const logs    = Storage.getLogs(currentUser.id, activeProfile.id || activeProfile._id);
   wellnessScore = RecommendationEngine.calculateWellnessScore(activeProfile, logs);
+
+  if (typeof Storage.syncTodayLogsToBackend === 'function') {
+    Storage.syncTodayLogsToBackend(currentUser.id).catch(console.warn);
+  }
 
   renderWellnessScore();
   renderStatCards();
@@ -138,7 +149,7 @@ function renderStatCards() {
   if (!currentPlan) return;
 
   const { hydration, sleep, calorie } = currentPlan;
-  const logs     = Storage.getLogs(currentUser.id);
+  const logs     = Storage.getLogs(currentUser.id, activeProfile.id || activeProfile._id);
   const today    = Storage.today();
   const todayWater = logs.filter(l => l.date === today && l.type === 'water').reduce((s, l) => s + l.value, 0);
   const todaySleep  = logs.filter(l => l.date === today && l.type === 'sleep').slice(-1)[0]?.value || 0;
@@ -289,7 +300,7 @@ function renderTips() {
 
 function renderQuickLog() {
   const today = Storage.today();
-  const logs  = Storage.getLogsForDate(currentUser.id, today);
+  const logs  = Storage.getLogsForDate(currentUser.id, today, activeProfile.id || activeProfile._id);
 
   const waterLogged = logs.filter(l => l.type === 'water').reduce((s,l) => s+l.value, 0);
   const sleepLogged = logs.filter(l => l.type === 'sleep').slice(-1)[0]?.value || '';
@@ -344,7 +355,7 @@ function handleQuickLog(e) {
   if (logged) {
     Toast.show('Activity logged successfully! 🎉', 'success');
 
-    const logs    = Storage.getLogs(currentUser.id);
+    const logs    = Storage.getLogs(currentUser.id, activeProfile.id || activeProfile._id);
     wellnessScore = RecommendationEngine.calculateWellnessScore(activeProfile, logs);
     renderWellnessScore();
     renderStatCards();

@@ -1,5 +1,3 @@
-
-
 'use strict';
 
 function simpleHash(str) {
@@ -22,14 +20,13 @@ const Validators = {
   },
 
   sanitize(str) {
-    return String(str).trim();
+    return String(str || '').trim();
   },
 };
 
 const Auth = {
-
-  
-  register(data) {
+  // Register new user via Backend REST API (with local fallback if offline)
+  async register(data) {
     const name     = Validators.sanitize(data.name);
     const email    = Validators.sanitize(data.email);
     const password = data.password || '';
@@ -44,10 +41,35 @@ const Auth = {
     if (!Validators.isValidPassword(password)) {
       return { success: false, message: 'Password must be at least 6 characters.' };
     }
-    if (password !== confirm) {
+    if (confirm && password !== confirm) {
       return { success: false, message: 'Passwords do not match.' };
     }
 
+    // Try MongoDB REST API first
+    if (window.API && typeof window.API.auth?.register === 'function') {
+      const apiRes = await window.API.auth.register({ name, email, password });
+      if (apiRes.success) {
+        if (apiRes.token) {
+          window.API.setToken(apiRes.token);
+        }
+        const userObj = {
+          id: apiRes.user?.id || apiRes.user?._id,
+          name: apiRes.user?.name,
+          email: apiRes.user?.email,
+          createdAt: apiRes.user?.createdAt || new Date().toISOString(),
+        };
+        Storage.saveUser(userObj);
+        return {
+          success: true,
+          message: apiRes.message || 'Account created successfully! Please log in to continue.',
+          user: userObj,
+        };
+      } else if (!apiRes.networkError) {
+        return { success: false, message: apiRes.message || 'Registration failed.' };
+      }
+    }
+
+    // Offline / Local fallback
     if (Storage.getUserByEmail(email)) {
       return { success: false, message: 'An account with this email already exists.' };
     }
@@ -61,20 +83,50 @@ const Auth = {
     };
 
     Storage.saveUser(user);
-
     return { success: true, message: 'Account created successfully! Please log in to continue.', user };
   },
 
-  
-  login(data) {
+  // Authenticate user via Backend REST API
+  async login(data) {
     const email    = Validators.sanitize(data.email).toLowerCase();
     const password = data.password || '';
 
     if (!email)    return { success: false, message: 'Email address is required.' };
     if (!password) return { success: false, message: 'Password is required.' };
 
-    const user = Storage.getUserByEmail(email);
+    // Try MongoDB REST API first
+    if (window.API && typeof window.API.auth?.login === 'function') {
+      const apiRes = await window.API.auth.login({ email, password });
+      if (apiRes.success) {
+        if (apiRes.token) {
+          window.API.setToken(apiRes.token);
+        }
+        const userObj = {
+          id: apiRes.user?.id || apiRes.user?._id,
+          name: apiRes.user?.name,
+          email: apiRes.user?.email,
+          avatar: apiRes.user?.avatar,
+        };
+        Storage.setCurrentUser(userObj);
+        Storage.saveUser(userObj);
 
+        // Synchronize remote profiles to local cache for instant UI rendering
+        if (typeof Storage.syncProfilesFromBackend === 'function') {
+          await Storage.syncProfilesFromBackend(userObj.id);
+        }
+
+        return {
+          success: true,
+          message: apiRes.message || `Welcome back, ${userObj.name}!`,
+          user: userObj,
+        };
+      } else if (!apiRes.networkError) {
+        return { success: false, message: apiRes.message || 'Login failed.' };
+      }
+    }
+
+    // Offline / Local fallback
+    const user = Storage.getUserByEmail(email);
     if (!user) {
       return { success: false, message: 'No account found with this email.' };
     }
@@ -83,37 +135,34 @@ const Auth = {
       return { success: false, message: 'Incorrect password. Please try again.' };
     }
 
-    Storage.setCurrentUser({ id: user.id, email: user.email });
-
+    Storage.setCurrentUser({ id: user.id, email: user.email, name: user.name });
     return { success: true, message: `Welcome back, ${user.name}!`, user };
   },
 
-  
   logout() {
+    if (window.API && typeof window.API.clearToken === 'function') {
+      window.API.clearToken();
+    }
     Storage.clearCurrentUser();
     window.location.href = 'index.html';
   },
 
-  
   getCurrentUser() {
     const session = Storage.getCurrentUser();
     if (!session) return null;
-    return Storage.getUserById(session.id);
+    return Storage.getUserById(session.id) || session;
   },
 
-  
   isLoggedIn() {
     return !!Storage.getCurrentUser();
   },
 
-  
   requireAuth() {
     if (!this.isLoggedIn()) {
       window.location.href = 'index.html';
     }
   },
 
-  
   redirectIfLoggedIn() {
     if (this.isLoggedIn()) {
       window.location.href = 'dashboard.html';
@@ -149,7 +198,6 @@ const ThemeManager = {
   init() {
     document.documentElement.setAttribute('data-theme', 'light');
   },
-
   toggle() {},
 };
 
@@ -157,7 +205,7 @@ const NavbarUtils = {
   init() {
     ThemeManager.init();
 
-    document.querySelectorAll('.navbar__theme-btn').forEach(btn => {
+    document.querySelectorAll('.navbar__theme-btn').forEach((btn) => {
       btn.addEventListener('click', () => ThemeManager.toggle());
     });
 
@@ -179,14 +227,14 @@ const NavbarUtils = {
     }
 
     const path = window.location.pathname.split('/').pop();
-    document.querySelectorAll('.navbar__link').forEach(link => {
+    document.querySelectorAll('.navbar__link').forEach((link) => {
       const href = link.getAttribute('href');
       if (href && (href === path || href.includes(path))) {
         link.classList.add('active');
       }
     });
 
-    document.querySelectorAll('[data-action="logout"]').forEach(btn => {
+    document.querySelectorAll('[data-action="logout"]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         Auth.logout();
@@ -197,7 +245,7 @@ const NavbarUtils = {
       const session = Storage.getCurrentUser();
       if (session) {
         const profile = Storage.getActiveProfile(session.id);
-        if (profile && profile.gender === 'women' && profile.cycleData?.lastPeriodDate) {
+        if (profile && profile.gender === 'women') {
           document.getElementById('cycle-nav-link')?.style.removeProperty('display');
           document.getElementById('cycle-nav-link-mobile')?.style.removeProperty('display');
         }
@@ -207,7 +255,6 @@ const NavbarUtils = {
 };
 
 const FormHelpers = {
-  
   setError(input, message) {
     input.classList.add('form-input--error');
     const group = input.closest('.form-group');
@@ -221,7 +268,6 @@ const FormHelpers = {
     }
   },
 
-  
   clearError(input) {
     input.classList.remove('form-input--error');
     const group = input.closest('.form-group');
@@ -231,15 +277,13 @@ const FormHelpers = {
     }
   },
 
-  
   clearAllErrors(form) {
-    form.querySelectorAll('.form-input--error').forEach(el => {
+    form.querySelectorAll('.form-input--error').forEach((el) => {
       el.classList.remove('form-input--error');
     });
-    form.querySelectorAll('.form-error').forEach(el => el.remove());
+    form.querySelectorAll('.form-error').forEach((el) => el.remove());
   },
 
-  
   serialize(form) {
     const data = {};
     new FormData(form).forEach((value, key) => {

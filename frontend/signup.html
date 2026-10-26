@@ -146,6 +146,8 @@
 
   <div id="toast-container"></div>
 
+  <script src="js/apiConfig.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
   <script>
@@ -177,8 +179,8 @@
       btn.classList.add('btn--loading');
       btn.disabled = true;
 
-      setTimeout(() => {
-        const result = Auth.register(data);
+      setTimeout(async () => {
+        const result = await Auth.register(data);
         btn.classList.remove('btn--loading');
         btn.disabled = false;
 
@@ -199,7 +201,7 @@
             FormHelpers.setError(document.getElementById('confirm-password'), result.message);
           }
         }
-      }, 600);
+      }, 500);
     });
 
     document.getElementById('email').addEventListener('blur', function() {

@@ -87,9 +87,16 @@ const CONCERNING_SYMPTOMS = [
 let currentUser   = null;
 let activeProfile = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   Auth.requireAuth();
   currentUser   = Auth.getCurrentUser();
+  if (currentUser && typeof Storage.syncProfilesFromBackend === 'function') {
+    try {
+      await Storage.syncProfilesFromBackend(currentUser.id);
+    } catch (e) {
+      console.warn('[WellSync] Profile sync warning:', e);
+    }
+  }
   activeProfile = Storage.getActiveProfile(currentUser.id);
 
   if (!activeProfile) {
@@ -387,7 +394,7 @@ function renderCycleCalendar(lastPeriodDate, cycleLength) {
   const cycleLen = Number(cycleLength) || 28;
   const periodDuration = 5;
 
-  const cycleLogs = Storage.getCycleLogs(currentUser.id);
+  const cycleLogs = Storage.getCycleLogs(currentUser.id, activeProfile.id || activeProfile._id);
 
   let html = `
     <div class="flex justify-between items-center flex-wrap gap-3 mb-4" style="padding: 0 var(--space-1);">
@@ -487,7 +494,7 @@ function renderCycleHistory() {
   const container = document.getElementById('cycle-history');
   if (!container) return;
 
-  const logs = Storage.getCycleLogs(currentUser.id).slice(-6).reverse();
+  const logs = Storage.getCycleLogs(currentUser.id, activeProfile.id || activeProfile._id).slice(-6).reverse();
 
   if (logs.length === 0) {
     container.innerHTML = `<p class="text-muted text-sm" style="padding:var(--space-4)">No cycle history logged yet.</p>`;

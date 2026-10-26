@@ -8,6 +8,13 @@ let activeProfile = null;
 document.addEventListener('DOMContentLoaded', async () => {
   Auth.requireAuth();
   currentUser   = Auth.getCurrentUser();
+  if (currentUser && typeof Storage.syncProfilesFromBackend === 'function') {
+    try {
+      await Storage.syncProfilesFromBackend(currentUser.id);
+    } catch (e) {
+      console.warn('[WellSync] Profile sync warning:', e);
+    }
+  }
   activeProfile = Storage.getActiveProfile(currentUser.id);
 
   if (!activeProfile) {
@@ -18,6 +25,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLogForm();
   renderRecentLogs();
+  if (typeof Storage.syncTodayLogsToBackend === 'function') {
+    Storage.syncTodayLogsToBackend(currentUser.id).catch(console.warn);
+  }
   await renderCharts();
 });
 
@@ -87,7 +97,7 @@ function renderRecentLogs() {
   const container = document.getElementById('recent-logs');
   if (!container) return;
 
-  const logs = Storage.getLogs(currentUser.id)
+  const logs = Storage.getLogs(currentUser.id, activeProfile.id || activeProfile._id)
     .slice(-15)
     .reverse();
 
@@ -128,7 +138,7 @@ window.deleteLog = deleteLog;
 async function renderCharts() {
   const days     = getLast7Days();
   const labels   = days.map(formatDay);
-  const logs     = Storage.getLogs(currentUser.id);
+  const logs     = Storage.getLogs(currentUser.id, activeProfile.id || activeProfile._id);
   const hydration = RecommendationEngine.calculateHydration(activeProfile);
   const sleep    = RecommendationEngine.getSleepRecommendation(activeProfile.age);
 
@@ -195,7 +205,7 @@ async function renderCharts() {
   });
 
   const exerciseData = days.map(day =>
-    logs.filter(l => l.date === day && l.type === 'exercise').length
+    logs.filter(l => l.date === day && (l.type === 'exercise' || l.type === 'yoga')).length
   );
 
   buildOrUpdateChart('chart-exercise', {

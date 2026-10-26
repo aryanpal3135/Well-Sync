@@ -43,11 +43,15 @@ const PROFILE_TYPES = {
 let selectedType  = null;
 let currentUser   = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   Auth.requireAuth();
   currentUser = Auth.getCurrentUser();
 
   if (!currentUser) return;
+
+  if (typeof Storage.syncProfilesFromBackend === 'function') {
+    await Storage.syncProfilesFromBackend(currentUser.id);
+  }
 
   initTypeSelector();
   populateExistingProfiles();
@@ -336,7 +340,7 @@ function wireBMIPreview() {
   weightInput?.addEventListener('input', update);
 }
 
-function handleProfileSubmit(e) {
+async function handleProfileSubmit(e) {
   e.preventDefault();
 
   const form = e.target;
@@ -391,7 +395,10 @@ function handleProfileSubmit(e) {
     updatedAt: new Date().toISOString(),
   };
 
-  Storage.saveProfile(currentUser.id, profile);
+  btn.classList.add('btn--loading');
+  btn.disabled = true;
+
+  const saveResult = await Storage.saveProfile(currentUser.id, profile);
   Storage.setActiveProfile(currentUser.id, profile.id);
 
   if (cycleData?.lastPeriodDate) {
@@ -404,13 +411,10 @@ function handleProfileSubmit(e) {
     });
   }
 
-  btn.classList.add('btn--loading');
-  btn.disabled = true;
-
-  Toast.show('Profile saved! Generating your personalized plan...', 'success');
+  Toast.show('Profile saved successfully! Generating plan...', 'success');
   setTimeout(() => {
     window.location.href = 'recommendations.html';
-  }, 1000);
+  }, 800);
 }
 
 function populateExistingProfiles() {
@@ -539,11 +543,17 @@ function editProfile(profileId) {
       Storage.saveProfile(currentUser.id, updatedProfile);
       Storage.setActiveProfile(currentUser.id, updatedProfile.id);
 
-      if (cycleData?.lastPeriodDate) {
+      const profileKey = updatedProfile.id || updatedProfile._id;
 
+      if (cycleData?.lastPeriodDate) {
+        // Clear only the cycle logs that belong to this profile, not all profiles
         const allCycle = Storage.get('wellsync_cycle_logs', {});
-        allCycle[currentUser.id] = [];
-        Storage.set('wellsync_cycle_logs', allCycle);
+        if (allCycle[currentUser.id]) {
+          allCycle[currentUser.id] = allCycle[currentUser.id].filter(
+            (l) => l.profileId && l.profileId !== profileKey
+          );
+          Storage.set('wellsync_cycle_logs', allCycle);
+        }
 
         Storage.addCycleLog(currentUser.id, {
           startDate:   cycleData.lastPeriodDate,
@@ -553,10 +563,14 @@ function editProfile(profileId) {
           energy:      cycleData.energyLevel,
         });
       } else {
-
+        // If no cycle data, only clear cycle logs for this specific profile
         const allCycle = Storage.get('wellsync_cycle_logs', {});
-        delete allCycle[currentUser.id];
-        Storage.set('wellsync_cycle_logs', allCycle);
+        if (allCycle[currentUser.id]) {
+          allCycle[currentUser.id] = allCycle[currentUser.id].filter(
+            (l) => l.profileId && l.profileId !== profileKey
+          );
+          Storage.set('wellsync_cycle_logs', allCycle);
+        }
       }
 
       btn.classList.add('btn--loading');
@@ -588,10 +602,24 @@ function deleteProfile(profileId) {
 
   Storage.deleteProfile(currentUser.id, profileId);
 
+  // Only remove cycle logs that belong to this specific profile
   if (profile && profile.gender === 'women') {
     const allCycle = Storage.get('wellsync_cycle_logs', {});
-    delete allCycle[currentUser.id];
-    Storage.set('wellsync_cycle_logs', allCycle);
+    if (allCycle[currentUser.id]) {
+      allCycle[currentUser.id] = allCycle[currentUser.id].filter(
+        (l) => l.profileId && l.profileId !== profileId
+      );
+      Storage.set('wellsync_cycle_logs', allCycle);
+    }
+  }
+
+  // Only remove health logs that belong to this specific profile
+  const allHealth = Storage.get('wellsync_health_logs', {});
+  if (allHealth[currentUser.id]) {
+    allHealth[currentUser.id] = allHealth[currentUser.id].filter(
+      (l) => l.profileId && l.profileId !== profileId
+    );
+    Storage.set('wellsync_health_logs', allHealth);
   }
 
   const formSec = document.getElementById('profile-form-section');
@@ -639,7 +667,8 @@ function prepopulateForm(profile) {
 
   if (profile.gender === 'women') {
     const cycleData = profile.cycleData || (() => {
-      const logs = Storage.getCycleLogs(currentUser.id);
+      const profId = profile.id || profile._id;
+      const logs = Storage.getCycleLogs(currentUser.id, profId);
       if (logs && logs.length > 0) {
         const latest = logs[logs.length - 1];
         return {

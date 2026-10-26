@@ -153,11 +153,12 @@
 
   <div id="toast-container"></div>
 
+  <script src="js/apiConfig.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/recommendationEngine.js"></script>
   <script src="js/progress.js"></script>
- <script src="js/progress.js"></script>
 <script>
   document.getElementById('log-type').addEventListener('change', function() {
     const units = { water: 'ml', sleep: 'hours', exercise: 'minutes', meal: 'meals', yoga: 'minutes' };
@@ -169,11 +170,11 @@
     const profile = Storage.getActiveProfile(user?.id);
     if (!user || !profile) return;
 
-    const weekLogs = Storage.getLogsForPastDays(user.id, 7);
-    const totalWater = weekLogs.filter(l => l.type === 'water').reduce((s,l) => s+l.value, 0);
+    const weekLogs = Storage.getLogsForPastDays(user.id, 7, profile.id || profile._id);
+    const totalWater = weekLogs.filter(l => l.type === 'water').reduce((s,l) => s + Number(l.value || 0), 0);
     const totalExercise = weekLogs.filter(l => l.type === 'exercise').length;
     const sleepLogs = weekLogs.filter(l => l.type === 'sleep');
-    const avgSleep = sleepLogs.length ? (sleepLogs.reduce((s,l) => s+l.value, 0) / sleepLogs.length).toFixed(1) : '—';
+    const avgSleep = sleepLogs.length ? (sleepLogs.reduce((s,l) => s + Number(l.value || 0), 0) / sleepLogs.length).toFixed(1) : '—';
     const yogaSessions = weekLogs.filter(l => l.type === 'yoga').length;
 
     document.getElementById('weekly-summary').innerHTML = `
